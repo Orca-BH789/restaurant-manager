@@ -1,0 +1,50 @@
+﻿@model List<BASIC_PROJECT.Models.DetailBooking>
+
+@{
+    ViewBag.Title = "Edit More Booking";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>Edit More Booking</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="form-horizontal">
+            <h4>Detail Booking</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @Html.HiddenFor(model => Model[i].DetaiBookingID)
+
+            <div class="form-group">
+                @Html.LabelFor(model => Model[i].MaBan, "MaBan", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => Model[i].MaBan, (SelectList)ViewBag.BanList, "Chọn một bàn", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => Model[i].MaBan, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => Model[i].Gia, "Gia", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => Model[i].Gia, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => Model[i].Gia, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="form-group mt-1 mb-1">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

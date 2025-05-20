@@ -1,0 +1,32 @@
+﻿@model BASIC_PROJECT.Models.KhuyenMai
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>KhuyenMai</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TenKM)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TenKM)
+        </dd>
+        <!-- Hiển thị các thông tin khác tương tự -->
+    </dl>
+    @using (Html.BeginForm("Delete", "KhuyenMai", new { id = Model.MaKM }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <!-- Các trường form khác -->
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default" })
+    }
+
+
+</div>
+

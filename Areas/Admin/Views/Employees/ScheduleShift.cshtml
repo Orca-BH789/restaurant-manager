@@ -1,0 +1,493 @@
+﻿@model IEnumerable<BASIC_PROJECT_Model.Models.WorkSchedule>
+@using BASIC_PROJECT_Model.Models
+@{
+    ViewBag.Title = "ScheduleShift";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var employees = (List<Employee>)ViewBag.Employees;
+    var shifts = (List<Shift>)ViewBag.Shifts;
+    var empDict = employees?.ToDictionary(e => e.EmployeeId, e => e.FullName) ?? new Dictionary<int, string>();
+    var shiftSt = shifts?.ToDictionary(s => s.ShiftId, s => s.StartTime) ?? new Dictionary<int, TimeSpan>();
+    var shiftE = shifts.ToDictionary(s => s.ShiftId, s => s.EndTime) ?? new Dictionary<int, TimeSpan>();
+}
+<head>
+    <link rel="stylesheet" href="~/Content/asset_nv/css/mobiscroll.javascript.min.css">
+    <script src="~/Content/asset_nv/js/mobiscroll.javascript.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            height: 100%;
+        }
+
+        .md-meal-type {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: .6;
+        }
+
+        .md-meal-planner-popup .mbsc-popup .mbsc-popup-header {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+        .md-meal-planner-cont {
+            position: relative;
+            padding-left: 34px;
+            text-align: left;
+        }
+
+        .md-meal-planner-title {
+            font-size: 20px;
+        }
+
+        .md-meal-planner-kcal {
+            color: #929292;
+        }
+
+        .md-meal-planner-icon {
+            position: absolute;
+            left: 0;
+        }
+
+        .md-meal-planner-calendar.mbsc-calendar .mbsc-schedule-event-all-day-inner {
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .md-meal-planner-calendar .md-meal-planner-event-title {
+            font-size: 12px;
+        }
+
+        .md-meal-planner-calendar .md-meal-planner-event-desc {
+            opacity: .6;
+        }
+
+        .md-meal-planner-popup .mbsc-segmented-item:first-child .mbsc-selected.mbsc-material,
+        .md-meal-planner-popup .mbsc-segmented-item:first-child .mbsc-selected.mbsc-windows,
+        .md-meal-planner-popup .mbsc-segmented-item:first-child .mbsc-segmented-selectbox-inner {
+            background: #f08786;
+        }
+
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(2) .mbsc-selected.mbsc-material,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(2) .mbsc-selected.mbsc-windows,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(2) .mbsc-segmented-selectbox-inner {
+            background: #8abe89;
+        }
+
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(3) .mbsc-selected.mbsc-material,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(3) .mbsc-selected.mbsc-windows,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(3) .mbsc-segmented-selectbox-inner {
+            background: #99d3ef;
+        }
+
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(4) .mbsc-selected.mbsc-material,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(4) .mbsc-selected.mbsc-windows,
+        .md-meal-planner-popup .mbsc-segmented-item:nth-child(4) .mbsc-segmented-selectbox-inner {
+            background: #f0ce8e;
+        }
+
+        .md-meal-planner-popup .mbsc-segmented-item:last-child .mbsc-selected.mbsc-material,
+        .md-meal-planner-popup .mbsc-segmented-item:last-child .mbsc-selected.mbsc-windows,
+        .md-meal-planner-popup .mbsc-segmented-item:last-child .mbsc-segmented-selectbox-inner {
+            background: #b48bce;
+        }
+    </style>
+
+
+
+</head>
+
+<div class="container-fluid">
+    <h2>Bảng Phân công</h2>
+    <div class="d-flex justify-content-between align-items-center">
+        <p>
+            @Html.ActionLink("Quay về ", "Index", null, new { @class = "btn btn-outline-info" })
+        </p>
+        <div class="btn-group float-right">
+            <button type="button" class="btn btn-primary" id="copyPasteDefault">Copy & Paste Tuần Sau</button>
+        </div>
+        <p class="text-right">
+            @Html.ActionLink("Chấm Công", "WorkClock", null, new { @class = "btn btn-success" })
+        </p>
+
+
+    </div>
+
+    <div mbsc-page class="demo-meal-planner">
+        <div style="height:100%">
+            <div id="demo-meal-planner" class="md-meal-planner-calendar"></div>
+            <div id="meal-planner-popup" class="md-meal-planner-popup">
+                <div id="meal-type-segmented" class="mbsc-form-group"></div>
+                <div class="mbsc-form-group">
+                    <label>
+                        Tên
+                        <input mbsc-input id="meal-name-input" />
+                    </label>
+                    <label>
+                        Ghi chú
+                        <textarea mbsc-textarea id="meal-notes-textarea"></textarea>
+                    </label>
+                </div>
+                <div class="mbsc-button-group">
+                    <button class="mbsc-button-block" id="meal-delete" mbsc-button data-color="danger" data-variant="outline">Xóa nhân viên này</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    function formatLocalDate(date) {
+        const localDate = new Date(date);
+        const year = localDate.getFullYear();
+        const month = String(localDate.getMonth() + 1).padStart(2, '0');
+        const day = String(localDate.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+
+    mobiscroll.setOptions({
+        locale: mobiscroll.localeVi,                                       // Specify language like: locale: mobiscroll.localePl or omit setting to use default
+        theme: 'ios',                                                      // Specify theme like: theme: 'ios' or omit setting to use default
+        themeVariant: 'light'                                              // More info about themeVariant: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-th
+    });
+
+    var calendar;
+    var check
+    var popup;
+    var oldMeal;
+    var tempMeal;
+    var deleteMeal;
+    var formatDate = mobiscroll.formatDate;
+    var nameInput = document.getElementById('meal-name-input');
+    var caloriesInput = document.getElementById('meal-calories-input');
+    var notesTextarea = document.getElementById('meal-notes-textarea');
+    var deleteButton = document.getElementById('meal-delete');
+    var typeCont = document.getElementById('meal-type-segmented');
+    var typesSegmented;
+
+    var types = [{
+                id: 1,
+                name: 'Ca Sáng',
+                color: '#e20f0f',
+                kcal: ' 9h00 - 14h00 ',
+                icon: '&#x1F31E;'
+            }, {
+             id: 2,
+                name: 'Ca Trưa',
+                color: '#157d13',
+                kcal: '14h00 - 20h00',
+                icon: '&#x1F55B;'
+             }, {
+             id: 3,
+                name: 'Ca Chiều',
+                color: '#137b7d',
+                kcal: '17h00 - 22h00',
+                icon: '&#x1F307;'
+            }];
+
+        function addMealPopup() {
+        // hide delete button inside add popup
+        deleteButton.style.display = 'none';
+        deleteMeal = true;
+        restoreMeal = false;
+
+        // set popup header text and buttons for adding
+        popup.setOptions({
+        headerText: '<div>Thêm nhân viên</div><div class="md-meal-type">' +
+            formatDate('DDDD, DD MMMM YYYY', new Date(tempMeal.start)) + '</div>',
+                    buttons: [
+                        'cancel',
+                        {
+                    text: 'Save',
+                            keyCode: 'enter',
+                            handler: function () {
+                    check = 2;
+                    calendar.updateEvent(tempMeal);
+                    deleteMeal = false;
+                    saveOrUpdateEmployee(tempMeal)
+                                popup.close();
+                },
+                            cssClass: 'mbsc-popup-button-primary'
+                        }
+                    ]
+                });
+
+
+        mobiscroll.getInst(nameInput).value = tempMeal.title;
+        mobiscroll.getInst(notesTextarea).value = '';
+        typesSegmented.forEach(function (elm) {
+            mobiscroll.getInst(elm).checked = +elm.value == tempMeal.resource;;
+            });
+
+            popup.open();
+
+        }
+        function saveOrUpdateEmployee(tempMeal) {
+                $.ajax({
+            url: '/Employees/SaveOrUpdateEmployee',
+                    type: 'POST',
+                    data: {
+                check: check,
+                        id: tempMeal.id,
+                        title: tempMeal.title,
+                        ngay: formatDate('YYYY-MM-DD', new Date(tempMeal.start)),
+                        resourceId: tempMeal.resource,
+                    },
+
+                    success: function (response) {
+                    alert(response.message);
+                },
+                    error: function (error) {
+                    alert("??? " + error.statusText);
+                    console.log(title, ngay, resourceId);
+                }
+            });
+        }
+
+        function editMealPopup(args) {
+            var ev = args.event;
+            var resource = types.find(function (obj) { return obj.id === ev.resource });
+
+
+            deleteButton.style.display = 'block';
+            deleteMeal = false;
+            restoreMeal = true;
+
+            popup.setOptions({
+            headerText: '<div> Sửa Nhân viên </div><div class="md-meal-type">' +  // More info about headerText: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-head
+                formatDate('DDDD, DD MMMM YYYY', new Date(tempMeal.start)) + '</div>',
+                    buttons: [                                                     // More info about buttons: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-buttons
+                        'cancel',
+                        {
+                text: 'Save',
+                            keyCode: 'enter',
+                            handler: function () {
+                        check = 1;
+                        // update event with the new properties on save button click
+                        calendar.updateEvent({
+                        id: ev.id,
+                                    title: tempMeal.title,
+                                    calories: tempMeal.calories,
+                                    notes: tempMeal.notes,
+                                    start: ev.start,
+                                    end: ev.end,
+                                    resource: tempMeal.resource,
+                                });
+                        saveOrUpdateEmployee(tempMeal)
+                                restoreMeal = false;
+                        popup.close();
+                    },
+                            cssClass: 'mbsc-popup-button-primary'
+                        }
+                    ]
+                });
+
+            // fill popup with the selected event data
+            mobiscroll.getInst(nameInput).value = ev.title || '';
+            mobiscroll.getInst(notesTextarea).value = ev.notes || '';
+            typesSegmented.forEach(function (elm) {
+                mobiscroll.getInst(elm).checked = +elm.value == tempMeal.resource;;
+                });
+
+                popup.open();
+            }
+
+            calendar = mobiscroll.eventcalendar('#demo-meal-planner', {
+            view: {                                                            // More info about view: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-view
+                timeline: {
+                    type: 'week',
+                        eventList: true,
+                        startDay: 1 ,
+                        endDay: 0
+                    }
+                },
+                data: [
+                   @foreach (var item in Model)
+                   {
+                       var name = empDict.ContainsKey(item.EmployeeId)
+                           ? empDict[item.EmployeeId]
+                           : "Unknown";
+                       var st = shiftSt.ContainsKey(item.ShiftId)
+                                   ? shiftSt[item.ShiftId].ToString(@"hh\:mm")
+                                   : "00:00";
+                       var et = shiftE.ContainsKey(item.ShiftId)
+                                   ? shiftE[item.ShiftId].ToString(@"hh\:mm")
+                                   : "00:00";
+
+                       @: { id: '@item.ScheduleId', title: '@Html.Raw(HttpUtility.HtmlDecode(name))', start: '@item.Date.ToString("yyyy-MM-ddT")@st', end: '@item.Date.ToString("yyyy-MM-ddT")@et', resource: @item.ShiftId },
+
+
+                   } ],
+                resources: types,                                              // More info about resources: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-resou
+                clickToCreate: true,
+                dragToCreate: true,
+                dragToMove: true,
+                dragToResize: true,
+                externalDrop: true,
+                extendDefaultEvent: function (ev) {                                // More info about extendDefaultEvent: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#
+                    return {
+                        title: 'Thêm Nhân viên'
+                    };
+                },
+                onEventCreated: function (args, inst) {                            // More info about onEventCreated: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#even
+                    // store temporary event
+                    tempMeal = args.event;
+                    setTimeout(function () {
+                        addMealPopup();
+                    }, 100);
+                },
+                onEventClick: function (args, inst) {                              // More info about onEventClick: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#event-
+                    oldMeal = Object.assign({}, args.event);
+                    tempMeal = args.event;
+
+                    if (!popup.isVisible()) {
+                        editMealPopup(args);
+                    }
+                },
+                renderResource: function (resource) {                              // More info about renderResource: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-
+                    return '<div class="md-meal-planner-cont">' +
+                        '<div class="md-meal-planner-title" style="color:' + resource.color + '">' +
+                        '<span class="md-meal-planner-icon">' + resource.icon + '</span>' + resource.name + '</div>' +
+                        '<div class="md-meal-planner-kcal">' + resource.kcal + '</div>' +
+                        '</div>';
+                },
+                renderScheduleEventContent: function (args) {                      // More info about renderScheduleEventContent: https://docs.mobiscroll.com/5-27-3/javascript/eventc
+                    var event = args.original;
+                    return '<div class="md-meal-planner-event">' +
+                        '<div class="md-meal-planner-event-title">' + event.title + '</div>' +
+                        (event.calories ? '<div class="md-meal-planner-event-desc">Calories: ' + event.calories + ' kcal</div>' : '') +
+                        '</div>';
+                },
+            });
+
+            popup = mobiscroll.popup('#meal-planner-popup', {
+                display: 'bottom',                                                 // Specify display mode like: display: 'bottom' or omit setting to use default
+                contentPadding: false,
+                fullScreen: true,
+                onClose: function () {                                             // More info about onClose: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#event-onClo
+                    if (deleteMeal) {
+                        calendar.removeEvent(tempMeal);
+                    } else if (restoreMeal) {
+                        calendar.updateEvent(oldMeal);
+                    }
+                },
+                responsive: {                                                      // More info about responsive: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-resp
+                    medium: {
+
+                        display: 'center',                       // Specify display mode like: display: 'bottom' or omit setting to use default
+                        width: 400,                                                // More info about width: https://docs.mobiscroll.com/5-27-3/javascript/eventcalendar#opt-width
+                        fullScreen: false,
+                        touchUi: false,
+                        showOverlay: false
+                    }
+                }
+            });
+
+            function getTypes() {
+                var data = [];
+
+                for (var i = 0; i < types.length; ++i) {
+                    var type = types[i];
+                    data.push({
+                        text: type.name,
+                        value: type.id
+                    })
+                }
+                return data;
+            }
+
+            function appendTypes() {
+                var segmented = '<div mbsc-segmented-group>';
+
+                for (var i = 0; i < types.length; ++i) {
+                    var type = types[i];
+                    segmented += '<label>' + type.name + '<input type="radio" mbsc-segmented name="meal-planner-type" value="' + type.id + '" class="meal-planner-type"></label>';
+                }
+
+                segmented += '</div>';
+                typeCont.innerHTML = segmented;
+                mobiscroll.enhance(typeCont);
+                typesSegmented = document.querySelectorAll('input[name=meal-planner-type]');
+
+                typesSegmented.forEach(function (elm) {
+                    elm.addEventListener('change', function (ev) {
+                        tempMeal.resource = +ev.target.value;
+                    });
+                });
+            }
+
+            appendTypes();
+
+            nameInput.addEventListener('change', function (ev) {
+                tempMeal.title = ev.target.value;
+            });
+
+            notesTextarea.addEventListener('change', function (ev) {
+                tempMeal.notes = ev.target.value;
+            });
+
+            deleteButton.addEventListener('click', function () {
+                check = 3;
+                calendar.removeEvent(tempMeal);
+                saveOrUpdateEmployee(tempMeal)
+                popup.close();
+
+                var deletedMeal = tempMeal;
+
+                mobiscroll.snackbar({
+                    button: {
+                        action: function () {
+                            calendar.addEvent(deletedMeal);
+
+                        },
+                        text: 'Undo'
+                    },
+                    message: 'Xóa nhân viên thành công'
+                });
+            });
+
+    // Nút mặc định: copy tuần này sang tuần sau
+    document.getElementById('copyPasteDefault').addEventListener('click', function () {
+        if (confirm('Bạn có chắc muốn sao chép lịch làm từ tuần này sang tuần sau không?')) {
+            $.ajax({
+                url: '/Employees/Copytuantruoc',
+                type: 'GET',
+                success: function (response) {
+                    alert(response.message);
+                }
+            });
+        }
+    });
+
+    // Nút trong dropdown: copy theo ngày người dùng chọn
+    document.getElementById('copyWithDate').addEventListener('click', function () {
+        const selectedDate = document.getElementById('customDate').value;
+
+        if (!selectedDate) {
+            alert('Vui lòng chọn ngày.');
+            return;
+        }
+
+        if (confirm(`Bạn có chắc muốn sao chép lịch làm cho ngày ${selectedDate}?`)) {
+            $.ajax({
+                url: '/Employees/Copytuantruoc',
+                type: 'GET',
+                data: { date: selectedDate },
+                success: function (response) {
+                    alert(response.message);
+                }
+            });
+        }
+    });
+
+    </script>
+</div>
+

@@ -1,0 +1,142 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.BangPhanCong>
+
+@{
+    ViewBag.Title = "ChamCong";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<head>
+    <link rel="stylesheet" href="~/Content/asset_nv/css/mobiscroll.javascript.min.css">
+    <script src="~/Content/asset_nv/js/mobiscroll.javascript.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        body,
+        html {
+            height: 100%;
+        }
+
+        .md-vertical-timeline .mbsc-timeline-row-gutter {
+            height: 8px;
+        }
+    </style>
+
+
+
+</head>
+
+<div class="container-fluid">
+    <h2>Bảng Chấm công</h2>
+    <div class="d-flex justify-content-between align-items-center">
+        <p>
+            @Html.ActionLink("Quay về ", "PhanCa", null, new { @class = "btn btn-outline-info" })
+        </p>
+        <p class="text-right">
+            @Html.ActionLink("Bảng Lương", "Tinhluong", null, new { @class = "btn btn-success" })
+        </p>
+        <p class="text-right">
+            <button class="btn btn-primary" id="Luu">Copy & Paste Tuần Sau</button>
+        </p>
+    </div>
+    <div mbsc-page class="demo-monthly-time table-vertical-days-horizontal-times">
+        <div style="height:400px">
+            <div id="demo-vertical-resolution" class="md-vertical-timeline"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+        mobiscroll.setOptions({
+            locale: mobiscroll.localeVi,
+            theme: 'ios',
+            themeVariant: 'light'
+        });
+        var tempMeal;
+
+        var calendar = mobiscroll.eventcalendar('#demo-vertical-resolution', {
+            view: {
+                timeline: {
+                    type: 'day',
+                    resolutionHorizontal: 'hour',
+                    resolutionVertical: 'day',
+                    startTime: '09:00',
+                    endTime: '24:00',
+                }
+            },
+            data: [
+               @foreach (var item in Model)
+                {
+                    @: { id: '@item.MaLichLam', title: '@Html.Raw(HttpUtility.HtmlDecode(item.HoTen))', start: '@item.Ngay.ToString("yyyy-MM-ddT")@item.GioBatDau', end: '@item.Ngay.ToString("yyyy-MM-ddT")@item.GioKetThuc', resource: @item.MaCa },
+                }
+                ],
+            dragToMove: true,
+            dragToResize: true,
+            dragInTime: true,
+            dragBetweenResources: true
+
+        });
+        document.getElementById('Luu').addEventListener('click', async function () {
+            var lichLamViecDataArray = [];
+
+            async function timMaNv(tenNhanVien) {
+                try {
+                    const response = await fetch('/NhanVien/timMaNv?tenNhanVien=' + encodeURIComponent(tenNhanVien));
+                    const data = await response.json();
+
+                    if (data && data.MaNV) {
+                        return data.MaNV;
+                    } else {
+                        console.log('Không tìm thấy MaNhanVien cho tên nhân viên:', tenNhanVien);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('Lỗi:', error);
+                    return null;
+                }
+            }
+
+            var allEvents = calendar.getEvents();
+
+            for (const event of allEvents) {
+                var maNhanVien = await timMaNv(event.title);
+
+                if (maNhanVien !== null) {
+                    var lichLamViecData = {
+                        MaLichLam: event.id,
+                        MaNhanVien: maNhanVien,
+                        Ngay: moment(event.start).format('YYYY-MM-DD'),
+                        GioDen: event.start,
+                        GioVe: event.end,
+                        MaCa: event.resource,
+                        CoMat: 1
+                    };
+
+                    lichLamViecDataArray.push(lichLamViecData);
+                }
+            }
+
+            // Gửi dữ liệu lên máy chủ
+            fetch('/NhanVien/LuuLichChamCong', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(lichLamViecDataArray),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Thành công:', data);
+                    alert('Dữ liệu đã được đổ xuống cơ sở dữ liệu thành công!');
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    alert('Có lỗi xảy ra khi đổ dữ liệu xuống cơ sở dữ liệu!\n' + error.message);
+                });
+        });
+
+
+
+
+
+    </script>
+</div>

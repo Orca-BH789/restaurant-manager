@@ -1,0 +1,86 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.KhuyenMai>
+@using BASIC_PROJECT.Models
+@{
+    ViewBag.Title = "ListKhuyenMai";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>Danh Sách Khuyến Mãi</h2>
+
+<p>
+    @Html.ActionLink("Thêm mới", "Create", null, new { @class = "btn btn-success", role = "button" })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Tên
+        </th>
+        <th>
+            Thông Tin
+        </th>
+        <th>
+            Ngày bắt đầu
+        </th>
+        <th>
+            Ngày kết thúc chương trình
+        </th>
+        <th>
+            Giảm Tiền
+        </th>
+        <th>
+            Giảm %
+        </th>
+        <th>
+            Sl min
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TenKM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Thongtin_CTKM)
+            </td>
+            <td>
+                @Html.FormatValue(@item.NgayBD, "{0:dd/MM/yyyy}")
+            </td>
+            <td>
+                @Html.FormatValue(@item.NgayKT, "{0:dd/MM/yyyy}")
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GiamGiaTheoTien)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GiamGiaPhanTram)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoLuongMuaToiThieu)
+            </td>
+            <td>
+                <a href="@Url.Action("AddKhuyenMai","AddCTKM", new { id = item.MaKM,name = item.TenKM })" class="btn btn-primary" role="button">
+                    <img src="~/assets/Anh/add-product.png" />
+                    Thêm sản phẩm
+                </a>
+            </td>
+            <td>
+                <a href="@Url.Action("Edit", new { id = item.MaKM })" class="btn btn-warning" role="button">
+                    <img src="~/assets/Anh/edit.png" />
+                    Sửa
+                </a>
+            </td>
+            <td>
+                <a href="@Url.Action("Delete", new { id = item.MaKM })" class="btn btn-danger" role="button">
+                    <img src="~/assets/Anh/Delete.jpg" />
+                    Xóa
+                </a>
+            </td>
+        </tr>
+    }
+
+</table>

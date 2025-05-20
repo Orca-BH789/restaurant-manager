@@ -1,0 +1,186 @@
+﻿@{
+    ViewBag.Title = "Tại chỗ";
+}
+
+<style>
+    .table-container {
+        padding: 20px;
+        min-height: 100vh;
+        padding-top: 70px;
+    }
+
+    .table-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin-bottom: 30px;
+    }
+
+    .table-item {
+        text-align: center;
+        margin: 10px;
+        cursor: pointer;
+    }
+
+    .table-icon {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 5px;
+    }
+
+    .table-name {
+        font-weight: bold;
+    }
+
+        .table-name.available {
+            color: green;
+        }
+
+        .table-name.booked {
+            color: red;
+        }
+
+    .customer-id {
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .back-button-container {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+    }
+
+    .back-button {
+        background-color: #337ab7;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+        .back-button:hover {
+            background-color: #286090;
+        }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+    .modal-button {
+        background-color: #337ab7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+        .modal-button:hover {
+            background-color: #286090;
+        }
+</style>
+
+<div class="table-container">
+    <div class="back-button-container">
+        <button class="back-button" onclick="location.href='@Url.Action("Index", "Booknew")'">
+            <i class="glyphicon glyphicon-arrow-left"></i> Quay lại
+        </button>
+    </div>
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div style="color: red;">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="table-row">
+            @{
+                var orderedTables = ((IEnumerable<dynamic>)ViewBag.Tables).Cast<dynamic>().OrderBy(t => (int)t.TableId).ToList();
+            }
+            @foreach (var table in orderedTables)
+            {
+                if (table.TableId.ToString() != "99") // Skip table with ID 99
+                {
+                    <div class="table-item" onclick="@(table.Status?.Trim() == "rảnh" || ViewBag.IdUser?.ToString() == table.CustomerId.ToString() ? "location.href='" + Url.Action("DatMon", "Booknew", new { tableId = table.TableId }) + "'" : "showBookedDialog()")">
+                        <img src="~/Content/Images/table-icon.png" alt="Table" class="table-icon" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'30\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'30\' cy=\'30\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'70\' cy=\'30\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'30\' cy=\'70\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'70\' cy=\'70\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'50\' cy=\'20\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'50\' cy=\'80\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'20\' cy=\'50\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/><circle cx=\'80\' cy=\'50\' r=\'8\' fill=\'white\' stroke=\'%23333\' stroke-width=\'2\'/></svg>'">
+                        <div class="table-name @(table.Status?.Trim() == "đã đặt" ? "booked" : "available")">
+                            @table.TableName - @table.Capacity người - @table.Status
+                        </div>
+                        <div class="customer-id">
+                            Customer ID: @(table.CustomerId == 0 ? "N/A" : table.CustomerId.ToString())
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
+    }
+</div>
+
+<!-- Modal for booked table -->
+<div id="bookedModal" class="modal">
+    <div class="modal-content">
+        <p>Bàn đã có người đặt, vui lòng chọn bàn khác hoặc liên hệ nhân viên để được phục vụ. Xin chân thành cảm ơn quý khách đã sử dụng dịch vụ.</p>
+        <button class="modal-button" onclick="closeBookedDialog()">Đóng</button>
+    </div>
+</div>
+
+<script>
+    function showBookedDialog() {
+        var modal = document.getElementById("bookedModal");
+        modal.style.display = "block";
+    }
+
+    function closeBookedDialog() {
+        var modal = document.getElementById("bookedModal");
+        modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function (event) {
+        var modal = document.getElementById("bookedModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>

@@ -1,0 +1,100 @@
+﻿@model BASIC_PROJECT.Models.MonAn
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+
+@using (Html.BeginForm("Create", "Food", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal text-dark h5">
+        <h4>Món Ăn</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.TenMon, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.TenMon, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.TenMon, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="mb-3 form-group">
+            <label for="ThontinMonan" class="form-label">Thông Tin Món Ăn</label>
+            @Html.TextAreaFor(model => model.ThontinMonan, new { @class = "form-control", @id = "ThontinMonan" })
+            <script>
+                CKEDITOR.replace('ThontinMonan');
+            </script>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Gia, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Gia, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Gia, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SLton, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SLton, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SLton, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DonViTinh, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="DonViTinh" name="DonViTinh">
+                    <option value="phần">phần</option>
+                    <option value="lon">lon</option>
+                    <option value="thung">thung</option>
+                    <option value="ly">ly</option>
+                    <option value="tô">tô</option>
+                    <option value="chén">chén</option>
+                    <option value="mẹt">mẹt</option>
+                    <option value="suất">suất</option>
+                    <option value="gói">gói</option>
+                    <option value="chai">chai</option>
+                    <option value="con">con</option>
+                    <option value="đĩa">đĩa</option>
+                    <option value="hộp">hộp</option>
+                    <option value="kg">kg</option>
+                    <option value="chiếc">chiếc</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.DonViTinh, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Loai, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="Loai" name="Loai">
+                    <option value="ThucAn">ThucAn</option>
+                    <option value="ComBo">ComBo</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.Loai, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Image", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" name="anh" id="anh" />
+            </div>
+        </div>
+
+        <div class="form-group mt-2">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default bg-primary text-white" />
+                @ViewBag.mess
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

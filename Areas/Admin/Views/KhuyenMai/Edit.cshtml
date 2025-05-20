@@ -1,0 +1,52 @@
+﻿@model BASIC_PROJECT.Models.KhuyenMai
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Sửa Thông Tin Khuyến Mãi</h5>
+            <div class="card">
+                @using (Html.BeginForm("Edit", "KhuyenMai"))
+                {
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(model => model.MaKM) @* Giữ nguyên MaKM để biết đây là bản ghi nào *@
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="TenKhuyenMai" class="form-label">Tên Chương Trình</label>
+                            @Html.TextBoxFor(model => model.TenKM, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="MoTa" class="form-label">Mô Tả</label>
+                            @Html.TextAreaFor(model => model.Thongtin_CTKM, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="NgayBatDau" class="form-label">Ngày Bắt Đầu</label>
+                            @Html.TextBoxFor(model => model.NgayBD, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="NgayKetThuc" class="form-label">Ngày Kết Thúc</label>
+                            @Html.TextBoxFor(model => model.NgayKT, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="GiamTien" class="form-label">Giảm Giá Tiền</label>
+                            @Html.TextBoxFor(model => model.GiamGiaTheoTien, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="GiamPT" class="form-label">Giảm Giá %</label>
+                            @Html.TextBoxFor(model => model.GiamGiaPhanTram, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="SLMin" class="form-label">Số Lượng Tối Thiểu</label>
+                            @Html.TextBoxFor(model => model.SoLuongMuaToiThieu, new { @class = "form-control" })
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

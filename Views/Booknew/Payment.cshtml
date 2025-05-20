@@ -1,0 +1,431 @@
+﻿<!-- Updated Payment.cshtml -->
+@{
+    ViewBag.Title = "Thanh toán";
+}
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+    body {
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .header {
+        background-color: #1e88e5;
+        color: white;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header-title {
+        font-size: 16px;
+        margin: 0;
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .main-container {
+        display: flex;
+        max-width: 800px;
+        margin: 20px auto;
+        gap: 20px;
+    }
+
+    .payment-methods {
+        flex: 0 0 200px;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .payment-methods h3 {
+            font-size: 16px;
+            margin: 0 0 10px;
+            text-align: center;
+        }
+
+    .payment-option {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
+        .payment-option.active {
+            background-color: #1e88e5;
+            color: white;
+            border-color: #1e88e5;
+        }
+
+        .payment-option:hover {
+            background-color: #f8f9fa;
+        }
+
+    .order-details {
+        flex: 1;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .order-details h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+            text-align: center;
+        }
+
+        .order-details p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .item-quantity {
+        width: 40px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .item-info {
+        flex-grow: 1;
+        padding-left: 10px;
+    }
+
+    .item-name {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .item-note {
+        font-size: 12px;
+        color: #555;
+        margin-top: 2px;
+    }
+
+    .item-price {
+        text-align: right;
+        color: #1e88e5;
+        font-size: 14px;
+    }
+
+    .discount-section {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .discount-section label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .discount-section input {
+            width: 150px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .discount-section .error {
+            color: red;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+    .total-amount {
+        font-weight: bold;
+        text-align: right;
+        margin-top: 10px;
+        font-size: 16px;
+        color: #e91e63;
+    }
+
+    .confirm-button {
+        display: block;
+        width: 100%;
+        background-color: #1e88e5;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+        .confirm-button:hover {
+            background-color: #1565c0;
+        }
+
+    .modal-content {
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+        .modal-content h4 {
+            font-size: 18px;
+            margin: 0 0 15px;
+            color: #333;
+        }
+
+        .modal-content img {
+            width: 400px;
+            height: 400px;
+            margin: 15px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-content p {
+            font-size: 14px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .modal-content .btn-default {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+    .modal-dialog {
+        max-width: 500px;
+        margin: 30px auto;
+    }
+
+    .modal {
+        outline: none;
+    }
+
+    .modal-open {
+        overflow: auto;
+        padding-right: 0 !important;
+    }
+</style>
+
+<div class="header">
+    <button class="back-button" onclick="location.href='@Url.Action("index", "Booknew")'">
+        <i class="glyphicon glyphicon-arrow-left"></i> Quay lại
+    </button>
+    <h1 class="header-title">Thanh toán</h1>
+</div>
+
+<div class="main-container">
+    <div class="payment-methods">
+        <h3>Phương thức thanh toán</h3>
+        <div class="payment-option active" data-method="cash">Tiền mặt</div>
+        <div class="payment-option" data-method="bank">Chuyển khoản</div>
+    </div>
+    <div class="order-details">
+        <h2>@(ViewBag.TableInfo ?? "Bàn không xác định")</h2>
+        <p><strong>Mã Đặt Bàn:</strong> @(ViewBag.BookingId != 0 ? ViewBag.BookingId.ToString() : "Chưa có")</p>
+        <h2>Giỏ hàng (@(ViewBag.OrderItems != null ? ViewBag.OrderItems.Count : 0))</h2>
+
+        @if (ViewBag.OrderItems != null && ViewBag.OrderItems.Count > 0)
+        {
+            foreach (var item in ViewBag.OrderItems)
+            {
+                <div class="order-item">
+                    <div class="item-quantity">@item.Quantity</div>
+                    <div class="item-info">
+                        <div class="item-name">@item.Name</div>
+                        @if (!string.IsNullOrEmpty(item.Note))
+                        {
+                            <div class="item-note">Ghi chú: @item.Note</div>
+                        }
+                    </div>
+                    <div class="item-price">@((item.Quantity * item.Price).ToString("N0")) đ</div>
+                </div>
+            }
+        }
+        else
+        {
+
+            <p>Không có món nào trong giỏ hàng.</p>
+        }
+
+        <div class="discount-section">
+            <label for="discount">Mã giảm giá:</label>
+            <input type="text" id="discount" value="" placeholder="Nhập mã giảm giá" />
+            <span class="error" id="discount-error"></span>
+        </div>
+
+        <div class="total-amount">
+            Tổng tiền: <span id="final-total">@(ViewBag.TotalAmount != null ? ViewBag.TotalAmount.ToString("N0") : "0")</span> đ
+        </div>
+
+        <button class="confirm-button">Xác nhận</button>
+    </div>
+</div>
+
+<!-- Modal for Bank Transfer QR -->
+<div class="modal fade" id="bankTransferModal" tabindex="-1" role="dialog" aria-labelledby="bankTransferModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <h4>Thanh toán qua VietQR</h4>
+            <img src="https://api.vietqr.io/image/BIDV-6504001775-compact.png?accountName=DUY%20TUAN%20A&amount=@(ViewBag.TotalAmount != null ? ViewBag.TotalAmount : 0)" alt="VietQR Code" id="qr-code" />
+            <p>Số tài khoản: 6504001775</p>
+            <p>Ngân hàng: BIDV</p>
+            <p>Số tiền: <span id="modal-total">@(ViewBag.TotalAmount != null ? ViewBag.TotalAmount.ToString("N0") : "0")</span> đ</p>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            var originalTotal = @(ViewBag.TotalAmount != null ? ViewBag.TotalAmount : 0);
+            var finalTotal = originalTotal;
+            var allPromotions = [];
+            var selectedPromotionId = null;
+            var bookingId = @(ViewBag.BookingId != 0 ? ViewBag.BookingId : 0);
+
+            // Load all promotions on page load
+            $.getJSON('@Url.Action("GetAllPromotions", "Booknew")', function (data) {
+                if (data.success) {
+                    allPromotions = data.promotions;
+                    console.log('Loaded', allPromotions.length, 'promotions');
+                } else {
+                    console.error('Error loading promotions:', data.message);
+                    $('#discount-error').text(data.message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.error('Failed to fetch promotions:', textStatus, errorThrown);
+                $('#discount-error').text('Lỗi khi tải mã giảm giá');
+            });
+
+            // Handle discount code input
+            $('#discount').on('input', function () {
+                var code = $(this).val().trim().toUpperCase();
+                var discountError = $('#discount-error');
+
+                if (code === '') {
+                    discountError.text('');
+                    selectedPromotionId = null;
+                    resetTotal();
+                    return;
+                }
+
+                // Find matching promotion
+                var promotion = allPromotions.find(p => p.name.toUpperCase() === code);
+
+                if (promotion && promotion.amount !== null && promotion.amount !== undefined) {
+                    var discount = parseFloat(promotion.amount);
+                    finalTotal = originalTotal - discount;
+                    if (finalTotal < 0) finalTotal = 0;
+                    selectedPromotionId = promotion.id;
+                    updateDisplay();
+                    discountError.text('');
+                } else {
+                    discountError.text('Mã giảm giá không hợp lệ');
+                    selectedPromotionId = null;
+                    resetTotal();
+                }
+            });
+
+            function resetTotal() {
+                finalTotal = originalTotal;
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                $('#final-total').text(finalTotal.toLocaleString('vi-VN'));
+                $('#modal-total').text(finalTotal.toLocaleString('vi-VN'));
+                $('#qr-code').attr('src', 'https://api.vietqr.io/image/BIDV-6504001775-compact.png?accountName=DUY%20TUAN%20A&amount=' + finalTotal);
+            }
+
+            // Handle payment method tabs
+            $('.payment-option').on('click', function () {
+                try {
+                    $('.payment-option').removeClass('active');
+                    $(this).addClass('active');
+                    if ($(this).data('method') === 'bank') {
+                        $('#bankTransferModal').modal('show');
+                    }
+                } catch (e) {
+                    console.error('Modal error:', e);
+                }
+            });
+
+            // Fix focus issue when modal is hidden
+            $('#bankTransferModal').on('hidden.bs.modal', function () {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $(this).removeAttr('aria-hidden');
+                $('.payment-option[data-method="bank"]').focus();
+            });
+
+            // Fix focus issue when modal is shown
+            $('#bankTransferModal').on('shown.bs.modal', function () {
+                $(this).find('.btn-default').focus();
+            });
+
+            // Handle confirm button click
+            $('.confirm-button').on('click', function () {
+                if (bookingId === 0) {
+                    alert('Mã đặt bàn không hợp lệ');
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("CreateInvoice", "Booknew")',
+                    type: 'POST',
+                    data: {
+                        bookingId: bookingId,
+                        promotionId: selectedPromotionId,
+                        totalAmount: finalTotal
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Xác nhận thanh toán thành công với tổng tiền: ' + finalTotal.toLocaleString('vi-VN') + ' đ');
+                        } else {
+                            alert('Lỗi: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Lỗi khi xác nhận thanh toán');
+                    }
+                });
+            });
+        });
+    })(jQuery);
+</script>

@@ -1,0 +1,82 @@
+﻿
+@model IEnumerable<BASIC_PROJECT_Model.Models.Customer>
+
+@{
+    ViewBag.Title = "Danh sách khách hàng";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2 style="margin-top:20px">Danh sách khách hàng</h2>
+
+<p>
+    @Html.ActionLink("Thêm mới", "Create", null, new { @class = "btn btn-success" })
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @Html.AntiForgeryToken()
+        @foreach (var item in Model)
+        {
+            <tr id="row-@item.CustomerId">
+                <td>@item.FullName</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNumber</td>
+                <td>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.CustomerId }, new { @class = "btn btn-primary btn-sm" })
+
+                    <a href="javascript:void(0)"
+                       class="btn btn-danger btn-sm"
+                       onclick="deleteCustomer(@item.CustomerId, '@item.FullName')">
+                        Xóa
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function deleteCustomer(id, name) {
+            Swal.fire({
+                title: 'Xóa khách hàng?',
+                text: `Bạn có chắc chắn muốn xóa "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+                    $.post('@Url.Action("DeleteConfirmed", "Customer")',
+                        { id: id, __RequestVerificationToken: token })
+                        .done(function (res) {
+                            if (res.success) {
+                                $('#row-' + id).fadeOut(300, function () { $(this).remove(); });
+                                Swal.fire('Đã xóa!', '', 'success');
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Lỗi', 'Xảy ra lỗi khi xóa', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

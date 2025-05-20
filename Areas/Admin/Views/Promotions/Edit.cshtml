@@ -1,0 +1,64 @@
+﻿@model BASIC_PROJECT_Model.Models.Promotion
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Sửa Thông Tin Khuyến Mãi</h5>
+            <div class="card">
+                @using (Html.BeginForm("Edit", "Promotions"))
+                {
+                    @Html.ValidationSummary(true)
+                    if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                if (!string.IsNullOrEmpty(error.ErrorMessage))
+                                {
+                                    <p>@error.ErrorMessage</p>
+                                }
+                            }
+                        </div>
+                    }
+                    @Html.HiddenFor(model => model.PromotionId) @* Dùng để update bản ghi *@
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tên Chương Trình</label>
+                            @Html.TextBoxFor(model => model.PromotionName, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô Tả</label>
+                            @Html.TextAreaFor(model => model.PromotionDetails, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ngày Bắt Đầu</label>
+                            @Html.TextBoxFor(model => model.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ngày Kết Thúc</label>
+                            @Html.TextBoxFor(model => model.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giảm Giá Tiền</label>
+                            @Html.TextBoxFor(model => model.DiscountAmount, new { @class = "form-control", type = "number", min = "1000" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giảm Giá %</label>
+                            @Html.TextBoxFor(model => model.DiscountPercentage, new { @class = "form-control", type = "number", step = "0.01" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số Lượng Tối Thiểu</label>
+                            @Html.TextBoxFor(model => model.MinPurchaseQuantity, new { @class = "form-control", type = "number" })
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

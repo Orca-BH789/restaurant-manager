@@ -1,0 +1,47 @@
+﻿@model BASIC_PROJECT.Models.NhanVien
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div class="container-fluid">
+    <h2>Thêm Nhân Viên Mới</h2>
+
+    @using (Html.BeginForm("Edit", "NhanVien", FormMethod.Post))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.HoTen, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.HoTen, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.HoTen, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SDT, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.SDT, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.SDT, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DiaChi, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.DiaChi, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.DiaChi, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LuongCB, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.LuongCB, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.LuongCB, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Ngaybatdaulam, new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Ngaybatdaulam, new { @class = "form-control", type = "date" })
+            @Html.ValidationMessageFor(model => model.Ngaybatdaulam, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <br />
+            <input type="submit" value="Lưu" class="btn btn-primary" />
+            @Html.ActionLink("Trở về trang chủ", "Index", null, new { @class = "btn btn-light-gray" })
+        </div>
+    }
+</div>

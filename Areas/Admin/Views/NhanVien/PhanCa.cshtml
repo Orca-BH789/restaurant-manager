@@ -1,0 +1,103 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.BangPhanCong>
+
+@{
+    ViewBag.Title = "PhanCa";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+
+<head>  
+    <meta charset="utf-8">
+    <script src="~/Content/dist/index.global.js"></script>
+    <script>
+
+ document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'vi', firstDay: 1,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listWeek'
+        },
+        views: {
+            listWeek: { buttonText: 'Danh sách' },
+            dayGridMonth: { buttonText: 'Lịch Tháng' }
+        },
+        initialView: 'dayGridMonth',
+        
+        editable: true,
+        selectable: true,
+        dayMaxEvents: true,
+        events: [            
+            @foreach (var item in Model)
+            {
+                @: { id: '@item.MaLichLam'  , title:'@Html.Raw(HttpUtility.HtmlDecode(item.HoTen))', start: '@item.Ngay.ToString("yyyy-MM-ddT")@item.GioBatDau', end: '@item.Ngay.ToString("yyyy-MM-ddT")@item.GioKetThuc' },
+            }
+        ],
+        eventContent: function (arg) {
+            var content = document.createElement('div');
+            content.className = 'event-content';
+
+            var title = document.createElement('div');
+            title.className = 'event-title';
+            title.textContent = arg.event.title;
+
+            var deleteButton = document.createElement('span');
+            deleteButton.innerHTML = '&times;';
+            deleteButton.className = 'delete-button';
+            deleteButton.addEventListener('click', function () {
+                calendar.getEventById(arg.event.id).remove();
+            });
+
+            content.appendChild(title);
+            content.appendChild(deleteButton);
+
+            return { domNodes: [content] };
+        }
+    });
+
+     calendar.render();
+ });
+
+    </script>
+    <style>
+
+        body {
+            margin: 40px 10px;
+            padding: 0;      
+            font-size: 14px;
+        }
+
+        #calendar {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .event-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;             
+           
+        }
+        .delete-button {
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<div class="container-fluid">
+    <h2>Lịch Làm Việc</h2>
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="text-right">
+            @Html.ActionLink("Xếp ca", "XepCa", null, new { @class = "btn btn-outline-info" })
+        </p>
+        <p class="text-right">
+            @Html.ActionLink("Tính Lương", "TinhLuong", null, new { @class = "btn btn-success" })
+        </p>
+    </div>
+    <div id='calendar'></div>
+</div>

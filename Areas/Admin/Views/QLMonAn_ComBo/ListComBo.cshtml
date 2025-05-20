@@ -1,0 +1,31 @@
+﻿@model IEnumerable<string>
+@{
+    ViewBag.Title = "ListComBo";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<!-- Các phần còn lại của view -->
+<h2>Danh Sách Combo</h2>
+
+<p>
+    @Html.ActionLink("Tạo Mới", "CreateComBo")
+</p>
+<table class="table">
+    <tr>
+        <th>Tên ComBo</th>
+        <th></th>
+    </tr>
+
+    @foreach (var tenComBo in Model)
+    {
+        <tr>
+            <td>
+                @tenComBo
+            </td>
+
+            <td>
+                @Html.ActionLink("Sửa", "Edit", new { name = tenComBo }) |
+                @Html.ActionLink("Xóa", "Deletes", new { name = tenComBo })
+            </td>
+        </tr>
+    }
+</table>

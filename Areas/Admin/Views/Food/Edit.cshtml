@@ -1,0 +1,102 @@
+﻿@model BASIC_PROJECT.Models.MonAn
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>MonAn</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.MaMA, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MaMA, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MaMA, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.TenMon, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.TenMon, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.TenMon, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="ThontinMonan" class="form-label">Thông Tin Món Ăn</label>
+            @Html.TextAreaFor(model => model.ThontinMonan, new { @class = "form-control", @id = "ThontinMonan" })
+            <script>
+                CKEDITOR.replace('ThontinMonan');
+            </script>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Gia, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Gia, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Gia, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SLton, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SLton, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SLton, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DonViTinh, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DonViTinh, new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "phần", Value = "phần" },
+                    new SelectListItem { Text = "lon", Value = "lon" },
+                    new SelectListItem { Text = "ly", Value = "ly" },
+                    new SelectListItem { Text = "tô", Value = "tô" },
+                    new SelectListItem { Text = "chén", Value = "chén" },
+                    new SelectListItem { Text = "mẹt", Value = "mẹt" },
+                    new SelectListItem { Text = "suất", Value = "suất" },
+                    new SelectListItem { Text = "gói", Value = "gói" },
+                    new SelectListItem { Text = "chai", Value = "chai" },
+                    new SelectListItem { Text = "con", Value = "con" },
+                    new SelectListItem { Text = "đĩa", Value = "đĩa" },
+                    new SelectListItem { Text = "hộp", Value = "hộp" },
+                    new SelectListItem { Text = "kg", Value = "kg" },
+                    new SelectListItem { Text = "chiếc", Value = "chiếc" },
+                }, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DonViTinh, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Loai, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Loai, new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "ThucAn", Value = "ThucAn" },
+                    new SelectListItem { Text = "ComBo", Value = "ComBo" }
+                }, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Loai, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group mt-2">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default bg-primary text-white" />
+            </div>
+        </div>
+    </div>
+}
+
+<div class="mt-1">
+    @Html.ActionLink("Back to List", "Index")
+</div>

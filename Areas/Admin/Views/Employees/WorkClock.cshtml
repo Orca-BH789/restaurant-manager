@@ -1,0 +1,416 @@
+﻿@model IEnumerable<BASIC_PROJECT_Model.Models.WorkSchedule>
+@using BASIC_PROJECT_Model.Models
+@using Newtonsoft.Json
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Prepare employees data
+    var employees = (List<Employee>)ViewBag.Employees;
+    var employeesJson = JsonConvert.SerializeObject(
+        employees.Select(s => new { s.EmployeeId, Name = s.FullName })
+    );
+
+    // Prepare existing schedules with ScheduleId and ShiftId
+    var schedules = Model.Select(s => new
+    {
+        s.ScheduleId,
+        s.EmployeeId,
+        Date = s.Date.ToString("yyyy-MM-dd"),
+        ResourceId = s.ShiftId
+    }).ToList();
+    var schedulesJson = JsonConvert.SerializeObject(schedules);
+
+    // Prepare shifts data
+    var shifts = (List<Shift>)ViewBag.Shifts;
+    var shiftsJson = JsonConvert.SerializeObject(
+        shifts.Select(s => new
+        {
+            s.ShiftId,
+            StartTime = s.StartTime.ToString(@"hh\:mm\:ss"),
+            EndTime = s.EndTime.ToString(@"hh\:mm\:ss"),
+            s.Salary
+        })
+    );
+}
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            flex: 1;
+            overflow: auto;
+        }
+
+        h2 {
+            color: #d35400;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 5px;
+            min-width: 40px;
+        }
+
+        th {
+            background-color: #f0c040;
+            color: #000;
+        }
+
+        .highlight-today {
+            background-color: #c8e6c9 !important;
+            font-weight: bold;
+        }
+
+        input {
+            width: 40px;
+            text-align: center;
+        }
+
+        .fixed-cols {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar d-flex justify-content-between align-items-center mb-3 px-3 flex-wrap gap-2">
+        <div>
+            @Html.ActionLink("← Quay về", "ScheduleShift", null, new { @class = "btn btn-outline-info" })
+        </div>
+        <div class="text-center flex-grow-1">
+            <h2 class="mb-0 fw-bold text-uppercase">Bảng Chấm Công</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" onclick="prevMonth()">← Tháng trước</button>
+            <span id="monthDisplay" class="fw-semibold my-auto"></span>
+            <button class="btn btn-outline-secondary" onclick="nextMonth()">Tháng sau →</button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mb-3 gap-2 flex-wrap">
+        <button class="btn btn-primary" onclick="saveWorkSchedule()">💾 Lưu thay đổi</button>
+        <button class="btn btn-warning text-white" onclick="window.print()">🖨️ In bảng chấm công</button>
+        <button id="btnExportExcel" class="btn btn-success">
+            <i class="fas fa-file-excel me-2"></i>Xuất bảng lương Excel
+        </button>
+    </div>
+
+    <div class="container">
+        <div style="overflow-x:auto; height:100%;">
+            <table id="attendanceTable"></table>
+        </div>
+    </div>
+
+    <script>
+        const employees = @Html.Raw(employeesJson);
+        const schedules = @Html.Raw(schedulesJson);
+        const shifts = @Html.Raw(shiftsJson);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('btnExportExcel').addEventListener('click', exportSalaryToExcel);
+        });
+
+        let currentDate = new Date();
+
+        function renderTable(date) {
+            const table = document.getElementById("attendanceTable");
+            table.innerHTML = "";
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            document.getElementById("monthDisplay").innerText = `Tháng ${month+1} / ${year}`;
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+
+            // HEADER
+            const thead = document.createElement("thead");
+            const headerRow = document.createElement("tr");
+            ["STT","Họ và tên"].forEach(title => {
+                const th = document.createElement("th");
+                th.className = "fixed-cols";
+                th.innerText = title;
+                headerRow.appendChild(th);
+            });
+            for (let d = 1; d <= daysInMonth; d++) {
+                const th = document.createElement("th");
+                const dow = new Date(year, month, d).getDay();
+                const dowStr = ["CN","T2","T3","T4","T5","T6","T7"][dow];
+                th.innerText = `${d}\n${dowStr}`;
+                if (new Date().getDate() === d && new Date().getMonth() === month && new Date().getFullYear() === year) {
+                    th.classList.add("highlight-today");
+                }
+                headerRow.appendChild(th);
+            }
+            ["Tổng Giờ Làm","Ngày nghỉ phép","Lương (VNĐ)"].forEach(txt => {
+                const th = document.createElement("th");
+                th.innerText = txt;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // BODY
+            const tbody = document.createElement("tbody");
+            employees.forEach((emp, idx) => {
+                const row = document.createElement("tr");
+                row.dataset.employeeId = emp.EmployeeId;
+
+                // Fixed columns
+                [idx+1, emp.Name].forEach(val => {
+                    const td = document.createElement("td");
+                    td.className = "fixed-cols";
+                    td.innerText = val;
+                    row.appendChild(td);
+                });
+
+                // Daily inputs
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const cell = document.createElement("td");
+                    const input = document.createElement("input");
+                    input.type = "text";
+
+                    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const sch = schedules.find(s => s.EmployeeId === emp.EmployeeId && s.Date === dateStr);
+                    if (sch) {
+                        input.value = "5";
+                        input.dataset.scheduleId = sch.ScheduleId;
+                        input.dataset.resourceId = sch.ResourceId;
+                    } else {
+                        input.dataset.resourceId = shifts[0].ShiftId;
+                    }
+                    input.addEventListener("input", () => updateTotal(row));
+                    if (new Date().getDate() === d && new Date().getMonth() === month && new Date().getFullYear() === year) {
+                        cell.classList.add("highlight-today");
+                    }
+                    cell.appendChild(input);
+                    row.appendChild(cell);
+                }
+
+                // Tổng công, nghỉ và lương
+                const totalTd = document.createElement("td"); totalTd.className = "total-cell"; totalTd.innerText = "0";
+                const offTd   = document.createElement("td"); offTd.className = "off-days-cell"; offTd.innerText = "0";
+                const salaryTd = document.createElement("td"); salaryTd.className = "salary-cell"; salaryTd.innerText = "0";
+                row.appendChild(totalTd);
+                row.appendChild(offTd);
+                row.appendChild(salaryTd);
+
+                tbody.appendChild(row);
+                updateTotal(row);
+            });
+            table.appendChild(tbody);
+        }
+
+        function updateTotal(row) {
+            const inputs = row.querySelectorAll("input");
+            let sum = 0, off = 0, salarySum = 0;
+            inputs.forEach(inp => {
+                const v = inp.value.trim().toLowerCase();
+                if (v === "p") off++;
+                else {
+                    const h = parseFloat(v);
+                    if (!isNaN(h)) {
+                        const hours = Math.min(Math.max(h,0),12);
+                        sum += hours;
+                        const shiftId = inp.dataset.resourceId;
+                        const shift = shifts.find(sh => sh.ShiftId == shiftId);
+                        const rate = shift ? parseFloat(shift.Salary) : 0;
+                        salarySum += hours * rate;
+                    }
+                }
+            });
+            row.querySelector(".total-cell").innerText = sum;
+            row.querySelector(".off-days-cell").innerText = off;
+            row.querySelector(".salary-cell").innerText = salarySum.toLocaleString('vi-VN', { minimumFractionDigits: 0 });
+        }
+
+        function prevMonth() { currentDate.setMonth(currentDate.getMonth()-1); renderTable(currentDate); }
+        function nextMonth() { currentDate.setMonth(currentDate.getMonth()+1); renderTable(currentDate); }
+        renderTable(currentDate);
+
+        // Hàm chức năng
+        function saveWorkSchedule() {
+            const salaryData = [];
+
+            document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
+                const employeeId = parseInt(row.dataset.employeeId);
+                const totalHours = parseFloat(row.querySelector(".total-cell").innerText);
+                const offDays = parseInt(row.querySelector(".off-days-cell").innerText);
+                const salary = parseFloat(row.querySelector(".salary-cell").innerText.replace(/\./g, "").replace(",", "."));
+
+                salaryData.push({
+                    EmployeeId: employeeId,
+                    Month: currentDate.getMonth() + 1,
+                    Year: currentDate.getFullYear(),
+                    TotalHours: totalHours,
+                    OffDays: offDays,
+                    SalaryAmount: salary
+                });
+            });
+
+            fetch('/Employees/SaveSalary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(salaryData)
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    alert("Đã lưu bảng lương thành công!");
+                } else {
+                    alert("Có lỗi xảy ra khi lưu!");
+                }
+            });
+        }
+
+        function exportSalaryToExcel() {
+            // Hiển thị thông báo đang xử lý
+            showLoading("Đang xuất file Excel...");
+
+            // Gọi API để lấy dữ liệu lương
+            fetch('/Employees/GetSalariesForExport', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không thể lấy dữ liệu lương ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        hideLoading();
+                        showAlert('warning', 'Không có dữ liệu lương để xuất');
+                        return;
+                    }
+
+                    // 👉 Sắp xếp theo Năm → Tháng → Tên nhân viên
+                    const sortedData = data.sort((a, b) => {
+                        if (a.year !== b.year) return b.year - a.year;
+                        if (a.month !== b.month) return b.month - a.month;
+                        return a.employeeName.localeCompare(b.employeeName);
+                    });
+
+                    // 👉 Định dạng dữ liệu xuất ra, có tiêu đề rõ ràng
+                    const formattedData = [
+                        {
+                            "Mã NV": "Mã NV",
+                            "Tên nhân viên": "Tên nhân viên",
+                            "Tháng": "Tháng",
+                            "Năm": "Năm",
+                            "Tổng giờ làm": "Tổng giờ làm",
+                            "Số ngày nghỉ": "Số ngày nghỉ",
+                            "Lương (VNĐ)": "Lương (VNĐ)"
+                        },
+                        ...sortedData.map(item => ({
+                            "Mã NV": item.employeeId,
+                            "Tên nhân viên": item.employeeName,
+                            "Tháng": item.month,
+                            "Năm": item.year,
+                            "Tổng giờ làm": item.totalHours,
+                            "Số ngày nghỉ": item.offDays,
+                            "Lương (VNĐ)": item.salaryAmount.toLocaleString('vi-VN')
+                        }))
+                    ];
+
+                    // 👉 Tạo worksheet và thiết lập độ rộng cột
+                    const worksheet = XLSX.utils.json_to_sheet(formattedData, { skipHeader: true });
+                    worksheet['!cols'] = [
+                        { wch: 10 }, // Mã NV
+                        { wch: 25 }, // Tên nhân viên
+                        { wch: 8 },  // Tháng
+                        { wch: 8 },  // Năm
+                        { wch: 15 }, // Tổng giờ làm
+                        { wch: 15 }, // Số ngày nghỉ
+                        { wch: 20 }  // Lương
+                    ];
+
+                    // 👉 Tạo workbook và thêm worksheet vào
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "BẢNG LƯƠNG NHÂN VIÊN");
+
+                    // 👉 Tạo tên file có ngày tháng
+                    const now = new Date();
+                    const fileName = `Bang_Luong_${now.getDate()}_${now.getMonth() + 1}_${now.getFullYear()}.xlsx`;
+
+                    // 👉 Xuất file
+                    XLSX.writeFile(workbook, fileName);
+
+                    hideLoading();
+                    showAlert('success', 'Xuất bảng lương thành công!');
+                })
+                .catch(error => {
+                    console.error('Lỗi xuất Excel:', error);
+                    hideLoading();
+                    showAlert('error', 'Không thể xuất file Excel: ' + error.message);
+                });
+        }
+
+        function showLoading(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: message,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            } else {
+                alert(message);
+            }
+        }
+
+        function hideLoading() {
+            if (typeof Swal !== 'undefined') {
+                Swal.close();
+            }
+        }
+
+        function showAlert(type, message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: type,
+                    title: message,
+                    timer: 3000
+                });
+            } else {
+                alert(message);
+            }
+        }
+    </script>
+</body>
+</html>

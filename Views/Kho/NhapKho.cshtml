@@ -1,0 +1,98 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.CTNhapHang>
+
+@{
+    ViewBag.Title = "NhapKho";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .confirm-button {
+        cursor: pointer;
+        padding: 5px 10px;
+        border: none;
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .confirmed {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+
+
+<h2>Danh Sách Nhập Hàng Hôm Nay</h2>
+
+<table >
+    <thead>
+        <tr>
+            <th>Mã Hàng</th>
+            <th>Tên Hàng</th>
+            <th>Giá Tiền</th>
+            <th>Số Lượng</th>
+            <th>Xác Nhận</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.TrangThai == false)
+            {
+                <tr>
+                    <td>@item.MaNL</td>
+                    <td>@item.NguyenLieu.TenNL</td>
+                    <td>Trong</td>
+                    <td>@item.SoLuong</td>
+                    <td><button class="confirm-button" onclick="confirmStatus(this)">Xác Nhận</button></td>
+                </tr>
+            }
+
+
+
+        }
+
+
+        <!-- Thêm các hàng khác ở đây -->
+    </tbody>
+</table>
+
+<script>
+    function confirmStatus(button) {
+       
+
+        if (button.textContent === "Xác Nhận") {
+            button.textContent = "Đã Xác Nhận";
+            button.classList.add("confirmed");
+        }
+
+    }
+</script>
+
+
+

@@ -1,0 +1,68 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.NhanVien>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+
+<div class="container-fluid ">
+    <h2>Danh sách Nhân viên </h2>
+    <div class="d-flex justify-content-between align-items-center">
+        <p>
+            @Html.ActionLink("Thêm mới", "Create", null, new { @class = "btn btn-success" })
+        </p>
+        <p class="text-right">
+            @Html.ActionLink("Lịch làm", "PhanCa", null, new { @class = "btn btn-outline-info" })
+        </p>
+    </div>
+    <table class="table ">
+        <tr class=" mb-4">
+            <th>
+                @Html.DisplayNameFor(model => model.HoTen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SDT)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiaChi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LuongCB)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ngaybatdaulam)
+            </th>
+
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HoTen)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SDT)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiaChi)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LuongCB)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ngaybatdaulam)
+                </td>
+
+                <td>
+                    <a href="@Url.Action("Edit", new { id = item.MaNV })" class="btn btn-warning" role="button">Sửa</a>
+                    <a href="@Url.Action("Delete", new { id = item.MaNV })" class="btn btn-danger"  role="button" >Xóa</a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+

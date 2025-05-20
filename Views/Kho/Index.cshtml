@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>@ViewBag.Message</h2>
+
+@if (ViewBag.Accounts != null)
+{
+    <ul>
+        @foreach (var account in ViewBag.Accounts)
+        {
+            <li>@account.Username</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Không có dữ liệu tài khoản.</p>
+}

@@ -1,0 +1,203 @@
+﻿@model IEnumerable<BASIC_PROJECT_Model.Models.Dish>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+
+<style>
+    .form-flex {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px; /* Điều chỉnh khoảng cách giữa ô select và nút button */
+    }
+
+        /* Điều chỉnh khoảng cách giữa các nút button */
+        .button-group button {
+            margin-left: 5px;
+        }
+
+    .custom-div {
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 8; /* 80% */
+        margin-right: 10px;
+    }
+
+    .search-button {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .filter-button {
+        flex: 1;
+    }
+
+
+    .select-div {
+        margin-top: 10px;
+    }
+</style>
+<link href="~/Content/style.css" rel="stylesheet" />
+
+
+<button class="btn btn-success" style="color: black; font-size:18px; margin-top: 25px; font-weight:bold" data-toggle="modal" data-target="#addDishModal">
+    Thêm món
+</button>
+
+
+
+<table class="table">
+    <tr>
+
+        <th>
+            @Html.DisplayNameFor(model => model.DishName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DishDescription)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Unit)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Category)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Image)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DishName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DishDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Unit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                <img src="@Html.DisplayFor(modelItem => item.Image)" width="100" height="90" />
+            </td>
+            <td class="d-flex gap-2">
+                <a href="@Url.Action("Details", "DishManage", new { id = item.DishId })"
+                   class="btn btn-info" title="Chi tiết món">
+                    <i class="bi bi-info-circle"></i>
+                </a>
+
+                <form action="@Url.Action("Delete", "DishManage")" method="post"
+                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa món này không?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@item.DishId" />
+                    <button type="submit" class="btn btn-danger" title="Xóa món">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </td>
+
+        </tr>
+    }
+</table>
+
+<!-- Modal -->
+
+
+<div class="modal fade" id="addDishModal" tabindex="-1" role="dialog" aria-labelledby="addDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm món mới</h5>
+
+            </div>
+            <div class="modal-body">
+                <form id="addDishForm" method="post" action="/DishManage/ThemMonMoi">
+                    <div class="form-group">
+                        <label for="dishName">Tên món:</label>
+                        <input type="text" class="form-control" name="dishName" id="dishName" required />
+
+                    </div>
+                    <div class="form-group">
+                        <label for="dishDescription">Mô tả:</label>
+                        <input type="text" class="form-control" name="dishDescription" id="dishDescription" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Giá:</label>
+                        <input type="number" class="form-control" name="price" id="price" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Đơn vị:</label>
+                        <input type="text" class="form-control" name="unit" id="unit" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Danh mục:</label>
+                        <input type="text" class="form-control" name="category" id="category" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="image">URL hình ảnh:</label>
+                        <input type="text" class="form-control" name="image" id="image" required />
+                    </div>
+                    <div style="margin-top: 15px; display: flex; align-content: center; justify-content:center">
+                        <button type="submit" style="margin-right:5px" class="btn btn-primary">Lưu</button>
+                        <button type="submit" style="margin-left:5px" data-dismiss="modal" class="btn btn-primary">Đóng</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- Thêm vào phần JavaScript của bạn -->
+<script>
+    $('#addDishForm').submit(function (event) {
+        event.preventDefault();
+        const dish = {
+            DishName: $('#dishName').val(),
+            DishDescription: $('#dishDescription').val(),
+            Price: parseFloat($('#price').val()),
+            Unit: $('#unit').val(),
+            Category: $('#category').val(),
+            Image: $('#image').val()
+        };
+        fetch('/DishManage/ThemMon', { ... })
+    });
+
+
+
+</script>
+
+
+
+
+<!-- Thêm vào đầu trang HTML của bạn -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

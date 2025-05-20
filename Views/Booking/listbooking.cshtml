@@ -1,0 +1,89 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.Booking>
+
+@{
+    ViewBag.Title = "listbooking";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2 style="color:brown">Danh sách đặt</h2>
+
+<p>
+    @Html.ActionLink("Đặt lịch ăn tại chỗ", "CreateBooking")
+</p>
+<p>
+    @Html.ActionLink("Đặt lịch ăn online", "CreateBookingOnline")
+</p>
+<p>
+    @Html.ActionLink("Danh Sách Bàn", "listtable")
+</p>
+<p>
+    @Html.ActionLink("Xem Danh Sách Chi Tiếc Booking", "ViewMoreDeltailBooking")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.BookID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MaKH)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NgayDat)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NgayDen)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ThoiDiemKetThuc)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Loai)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TongTienGoc)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TrangThai)
+        </th>
+        <th></th>
+        <th></th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaKH)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayDat)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayDen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ThoiDiemKetThuc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Loai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TongTienGoc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.BookID }) 
+            </td>
+            <td>
+                @Html.ActionLink("Đặt Bàn", "AddMoreDeltailBooking", new { id = item.BookID })
+            </td>
+        </tr>
+    }
+
+</table>

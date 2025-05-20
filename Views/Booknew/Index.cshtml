@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Nguồn Đơn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-center" style="font-size: 28px; margin-bottom: 30px; font-weight: bold;">Nguồn Đơn</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 text-center">
+            <a href="@Url.Action("TaiCho", "Booknew")" class="btn btn-primary btn-lg" style="margin-right: 20px; min-width: 150px;">Tại chỗ</a>
+            <a href="@Url.Action("MangVe", "Booknew")" class="btn btn-success btn-lg" style="min-width: 150px;">Mang về</a>
+        </div>
+    </div>
+</div>

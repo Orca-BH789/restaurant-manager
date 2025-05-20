@@ -1,0 +1,16 @@
+﻿@model BASIC_PROJECT.Models.NhanVien
+    @{
+        ViewBag.Title = "Delete";
+        Layout = "~/Views/Shared/_Layout1.cshtml";
+    }
+    <div class="container-fluid ">
+        @using (Html.BeginForm("Delete", "NhanVien", new { id = Model.MaNV }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <p>Bạn có chắc chắn muốn xóa nhân viên @Html.DisplayFor(model => model.HoTen)?</p>
+            <input type="submit" value="Xóa" class="btn btn-danger" />
+             @Html.ActionLink("Trở về trang chủ ", "Index", null, new { @class = "btn btn-primary" })
+        }
+
+    </div>
+

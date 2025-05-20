@@ -1,0 +1,117 @@
+﻿@model BASIC_PROJECT_Model.Models.Promotion
+@{
+    ViewBag.Title = "Tạo Khuyến Mãi Mới";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2 class="mb-4">🎉 Tạo Khuyến Mãi Mới</h2>
+
+@using (Html.BeginForm("Create", "Promotions", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+{
+    @Html.AntiForgeryToken()
+
+    if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-badge-ad me-2"></i> Thông tin khuyến mãi
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Tên & Chi tiết -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        @Html.TextBoxFor(m => m.PromotionName, new { @class = "form-control", placeholder = "Tên khuyến mãi", required = "required" })
+                        <label for="PromotionName">Tên khuyến mãi <span class="text-danger">*</span></label>
+                        @Html.ValidationMessageFor(m => m.PromotionName, "", new { @class = "invalid-feedback" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        @Html.TextAreaFor(m => m.PromotionDetails, new { @class = "form-control", placeholder = "Chi tiết khuyến mãi", style = "height:100px;" })
+                        <label for="PromotionDetails">Chi tiết khuyến mãi</label>
+                        @Html.ValidationMessageFor(m => m.PromotionDetails, "", new { @class = "invalid-feedback" })
+                    </div>
+                </div>
+
+                <!-- Ngày bắt đầu & kết thúc -->
+                <div class="col-md-6">
+                    <label class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar2-date"></i></span>
+                        @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "invalid-feedback d-block" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar2-date"></i></span>
+                        @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "invalid-feedback d-block" })
+                    </div>
+                </div>
+
+                <!-- Giá trị khuyến mãi -->
+                <div class="col-md-4">
+                    <label class="form-label">Tiền giảm (VNĐ)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₫</span>
+                        @Html.TextBoxFor(m => m.DiscountAmount, new { @class = "form-control", type = "number", min = "1000", step = "1000", placeholder = "0" })
+                        @Html.ValidationMessageFor(m => m.DiscountAmount, "", new { @class = "invalid-feedback d-block" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Phần trăm (%)</label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.DiscountPercentage, new { @class = "form-control", type = "number", step = "0.01", min = "0", max = "1", placeholder = "0.00" })
+                        <span class="input-group-text">%</span>
+                        @Html.ValidationMessageFor(m => m.DiscountPercentage, "", new { @class = "invalid-feedback d-block" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Số lượng tối thiểu</label>
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.MinPurchaseQuantity, new { @class = "form-control", type = "number", min = "1", placeholder = "1" })
+                        <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                        @Html.ValidationMessageFor(m => m.MinPurchaseQuantity, "", new { @class = "invalid-feedback d-block" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <button type="submit" class="btn btn-lg btn-success me-2">
+                <i class="bi bi-save2-fill me-1"></i> Lưu
+            </button>
+            @Html.ActionLink("Hủy", "Index", null, new { @class = "btn btn-lg btn-outline-secondary" })
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,62 @@
+﻿@model IEnumerable<BASIC_PROJECT.Models.Ban>
+
+@{
+    ViewBag.Title = "listtable";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>listtable</h2>
+
+<p>
+    @Html.ActionLink("Create New", "CreateTable")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.MaBan)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Tenban)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TrangThai)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NgayTao)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SoLuongNguoi)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.MaBan)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tenban)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TrangThai)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NgayTao)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SoLuongNguoi)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edittable", new { id = item.MaBan }) |
+            <form method="post" action="@Url.Action("Deletetable", "Booking")">
+                @Html.AntiForgeryToken() 
+                <input type="hidden" name="id" value="@item.MaBan" />
+                <button type="submit">Delete</button>
+            </form>
+
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,233 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+
+    var invoices = ViewBag.Invoices as List<BASIC_PROJECT.Controllers.InvoiceController.InvoiceViewModel> ?? new List<BASIC_PROJECT.Controllers.InvoiceController.InvoiceViewModel>();
+}
+
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+
+    .invoice-container {
+        margin-top: 40px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .invoice-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 12px 12px 0 0;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+        .invoice-header h2 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+    .table-invoice {
+        background-color: white;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+    }
+
+        .table-invoice thead th {
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .table-invoice tbody td {
+            padding: 12px;
+            vertical-align: middle !important;
+            font-size: 14px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-invoice tbody tr:hover {
+            background-color: #f1f3f5;
+            transition: background-color 0.3s ease;
+        }
+
+    .status-chua-thanh-toan {
+        background-color: #dc3545;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .status-da-thanh-toan {
+        background-color: #28a745;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .btn-approve {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+
+        .btn-approve:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-approve:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    .error-message {
+        color: #dc3545;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container invoice-container">
+    <div class="invoice-header">
+        <h2>Quản Lý Hóa Đơn</h2>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="error-message">
+            <p>@ViewBag.ErrorMessage</p>
+        </div>
+    }
+    else
+    {
+        <table class="table table-invoice">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ngày Xuất</th>
+                    <th>Tổng Tiền</th>
+                    <th>Tên Bàn</th>
+                    <th style="display:none">ID Bàn</th>
+                    <th>Trạng Thái</th>
+                    <th>Ngày Đặt</th>
+                    <th style="display:none">ID Đặt</th>
+                    <th>Loại</th>
+                    <th>Tên Khách</th>
+                    <th>Email</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTableBody">
+                @if (invoices != null && invoices.Count > 0)
+                {
+                    foreach (var invoice in invoices)
+                    {
+                        <tr>
+                            <td>@invoice.InvoiceId</td>
+                            <td>@invoice.IssueDate.ToString("dd-MM-yyyy")</td>
+                            <td>@invoice.TotalAmount</td>
+                            <td>@invoice.TableName</td>
+                            <td style="display:none">@invoice.TableId</td>
+                            <td>
+                                @if (string.Equals(invoice.Status, "Chưa thanh toán", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="status-chua-thanh-toan">Chưa thanh toán</span>
+                                }
+                                else if (string.Equals(invoice.Status, "Đã thanh toán", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="status-da-thanh-toan">Đã thanh toán</span>
+                                }
+                                else
+                                {
+                                    <span>@invoice.Status</span>
+                                }
+                            </td>
+                            <td>@(invoice.BookingDate == DateTime.MinValue ? "N/A" : invoice.BookingDate.ToString("yyyy-MM-dd"))</td>
+                            <td style="display:none">@invoice.BookingId</td>
+                            <td>@invoice.Type</td>
+                            <td>@invoice.FullName</td>
+                            <td>@invoice.Email</td>
+                            <td>@invoice.PhoneNumber</td>
+                            <td>
+                                @if (string.Equals(invoice.Status, "Chưa thanh toán", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <button class="btn btn-approve btn-sm" onclick="approveInvoice(@invoice.BookingId, @invoice.TableId)">Duyệt</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-approve btn-sm" disabled>Duyệt</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="13" class="text-center">Không có hóa đơn nào để hiển thị.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script>
+    function approveInvoice(bookingId, tableId) {
+        $.ajax({
+            url: '@Url.Action("Approve", "Invoice")',
+            type: 'POST',
+            data: { bookingId: bookingId, tableId: tableId },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    const row = $(`#invoiceTableBody tr`).filter(function () {
+                        return $(this).find('td:eq(7)').text() == bookingId;
+                    });
+                    row.find('td:eq(5)').html('<span class="status-da-thanh-toan">Đã thanh toán</span>');
+                    row.find('button').prop('disabled', true);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('Lỗi khi gửi yêu cầu duyệt hóa đơn.');
+            }
+        });
+    }
+</script>

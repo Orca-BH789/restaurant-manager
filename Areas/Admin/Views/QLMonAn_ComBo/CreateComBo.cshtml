@@ -1,0 +1,36 @@
+﻿@model BASIC_PROJECT.Models.CTCombo
+
+@{
+    ViewBag.Title = "Thêm ComBo";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Thêm Khuyến Mãi</h5>
+            <div class="card">
+                @using (Html.BeginForm("CreateComBo", "QLMonAn_ComBo", FormMethod.Post))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="TenComBo" class="form-label">Tên ComBo</label>
+                            @Html.TextBoxFor(model => model.TenComBo, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            <label for="MoTa" class="form-label">Mô Tả ComBo</label>
+                            @Html.TextAreaFor(model => model.MoTa, new { @class = "form-control", @id = "mota" })
+                            <script>
+                                CKEDITOR.replace('mota');
+                            </script>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary">Thêm Combo</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

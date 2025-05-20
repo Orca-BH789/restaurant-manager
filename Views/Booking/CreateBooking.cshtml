@@ -1,0 +1,42 @@
+﻿@model BASIC_PROJECT.Models.Booking
+
+@{
+    ViewBag.Title = "CreateBooking";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>CreateBooking</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Booking</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group" style="display:none">
+        @Html.LabelFor(model => model.MaKH, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="text" name="MaKH" value="1" />
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.TongTienGoc, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.TongTienGoc, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+            @Html.ValidationMessageFor(model => model.TongTienGoc, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

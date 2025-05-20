@@ -1,0 +1,143 @@
+﻿@model BASIC_PROJECT.Models.DetailBooking
+
+@{
+    ViewBag.Title = "Add Food To Detail Booking";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.carousel').carousel();
+    });
+</script>
+<h2>Add Food To Detail Booking</h2>
+@using (Html.BeginForm("AddFoodToDetailBooking", "Booking", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.DetaiBookingID)
+    @* Choose món ăn *@
+    <div class="form-group">
+        <label>Chọn Món Ăn:</label>
+        <div class="scrollable-container" style="max-height: 300px; overflow-y: auto;">
+            <div class="card-columns">
+                @foreach (var food in ViewBag.FoodList)
+                {
+                    @*<div class="card col-md-4">
+                        <img src="~/Images/@food.anh" class="card-img-top" alt="@food.TenMon" style="width: 100%">
+                        <div class="card-body">
+                            <h5 class="card-title"></h5>
+                            
+                        </div>
+                    </div>*@
+                    <div class="col-sm-2 col-md-2 col-lg-2 col-xs-2">
+                        <div class="thumbnail">
+                            <img src="~/Images/@food.anh" alt="Thumbnail Image 1" class="img-responsive img-rounded imgbook" style="width:200px;">
+                            <div class="caption">
+                                <h4 style="min-height:70px;">
+                                    @food.TenMon
+                                    <input type="checkbox" name="SelectedFoodIds" value="@food.MaMA" />
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <p>Số lượng FoodList: @ViewBag.FoodList.Count</p>
+    if (ViewBag.info == null)
+    {
+        <div class="form-group">
+            <label for="GhiChu">GhiChu:</label>
+            <textarea name="GhiChu" class="form-control" id="GhiChu"></textarea>
+            <script>
+                CKEDITOR.replace('GhiChu');
+            </script>
+        </div>
+
+        <div class="form-group">
+            <label for="NguyenNhan">NguyenNhan:</label>
+            <textarea name="NguyenNhan" class="form-control" id="NguyenNhan"></textarea>
+            <script>
+                CKEDITOR.replace('NguyenNhan');
+            </script>
+        </div>
+    }
+
+
+    <div class="form-group mt-2">
+        <input type="submit" value="Add Food" class="btn btn-primary" />
+    </div>
+}
+
+<div>
+    <h3 class="mt-3 text-info">Food Items in Detail Booking</h3>
+    <table class="table">
+        <tr>
+            <th>Food</th>
+            <th></th>
+        </tr>
+        @foreach (var foodDetail in ViewBag.FoodDetails)
+        {
+            <tr>
+                <td>
+                    @foodDetail.MonAn.TenMon
+                </td>
+                <td>
+                    @Html.ActionLink("Remove", "RemoveFoodFromDetailBooking", new { id = foodDetail.MaMA })
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+@using (Html.BeginForm("AddTTFoodOrder", "Booking", FormMethod.Post))
+{
+    <div class="form-group">
+        <label for="GhiChu">GhiChu:</label>
+        <textarea name="GhiChu" class="form-control" id="GhiChuUp">
+        @if (ViewBag.info != null)
+        {
+            @Html.Raw(ViewBag.info.GhiChu)
+        }
+    </textarea>
+        <script>
+            CKEDITOR.replace('GhiChuUp');
+        </script>
+    </div>
+    <div class="form-group">
+        <label for="NguyenNhan">NguyenNhan:</label>
+        <textarea name="NguyenNhan" class="form-control" id="NguyenNhanUp">
+        @if (ViewBag.info != null)
+        {
+            @Html.Raw(ViewBag.info.NguyenNhan)
+        }
+    </textarea>
+        <script>
+            CKEDITOR.replace('NguyenNhanUp');
+        </script>
+    </div>
+
+    <div class="form-group">
+        <input type="hidden" name="DetaiBookingID" value="@ViewBag.id" />
+    </div>
+
+    <div class="form-group mt-2">
+        <input type="submit" value="Lưu" class="btn btn-primary" />
+    </div>
+}
+<div class="mt-2">
+    @Html.ActionLink("Back to List", "ViewMoreDetailBooking")
+</div>

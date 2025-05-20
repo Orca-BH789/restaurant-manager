@@ -1,0 +1,53 @@
+﻿@model BASIC_PROJECT_Model.Models.RestaurantTable
+
+@{
+    ViewBag.Title = "Thêm Bàn";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>Thêm Bàn Mới</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <!-- Tên bàn -->
+        <div class="form-group">
+            @Html.LabelFor(m => m.TableName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.TableName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.TableName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <!-- Ngày tạo -->
+        <div class="form-group">
+            @Html.LabelFor(m => m.CreationDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.CreationDate, new { @class = "form-control", type = "date", value = DateTime.Now.ToString() })
+                @Html.ValidationMessageFor(m => m.CreationDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <!-- Sức chứa -->
+        <div class="form-group">
+            @Html.LabelFor(m => m.Capacity, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Capacity, new { @class = "form-control", type = "number", min = "1" })
+                @Html.ValidationMessageFor(m => m.Capacity, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <!-- Nút thao tác -->
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Thêm" class="btn btn-success" />
+                @Html.ActionLink("Trở về", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,101 @@
+﻿
+@model IEnumerable<BASIC_PROJECT_Model.Models.Account>
+@using BASIC_PROJECT_Model.Models
+@{
+    ViewBag.Title = "Danh sách tài khoản";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    var roles = (List<Role>)ViewBag.roles;
+    var RolepDict = roles?.ToDictionary(e => e.RoleId, e => e.RoleName) ?? new Dictionary<int, string>();
+}
+
+<div class="container-fluid px-4" style="margin-top:20px">
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-users-cog me-2"></i>Danh sách tài khoản</h4>
+            @Html.ActionLink(" Thêm mới", "Create", null, new { @class = "btn btn-light text-primary fw-bold" })
+        </div>
+        <div class="card-body">
+            @Html.AntiForgeryToken()
+
+            <table id="accountTable" class="table table-bordered table-hover table-striped">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Username</th>
+                        <th>Phân quyền (Role ID)</th>
+                        <th>Email</th>
+                        <th style="width: 160px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var name = RolepDict.ContainsKey(item.RoleId)
+                                    ? RolepDict[item.RoleId]
+                                    : "Unknown";
+
+                        <tr id="row-@item.Id">
+                            <td>@item.Username</td>
+                            <td>@name</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Email) ? "Không có email" : item.Email)</td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", "Account", new { id = item.Id })" class="btn btn-sm btn-warning me-1">Sửa</a>
+                                <a href="javascript:void(0)"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="deleteAccount(@item.Id, '@item.Username')">
+                                    Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables & SweetAlert2 -->
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#accountTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json'
+                }
+            });
+        });
+
+        function deleteAccount(id, username) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa tài khoản "${username}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+                    $.post('@Url.Action("DeleteConfirmed", "Account")',
+                        { id: id, __RequestVerificationToken: token })
+                        .done(function (res) {
+                            if (res.success) {
+                                $('#row-' + id).fadeOut(300, function () { $(this).remove(); });
+                                Swal.fire('Đã xóa!', '', 'success');
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Lỗi', 'Xảy ra lỗi khi xóa', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

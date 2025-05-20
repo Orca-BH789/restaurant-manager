@@ -1,0 +1,99 @@
+﻿@model BASIC_PROJECT_Model.Models.Dish
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<style>
+    label {
+        font-weight: bold;
+        font-size: 18px;
+        color: black;
+        margin-bottom: 5px;
+    }
+    input.form-control {
+        font-size: 18px;
+        color: black;
+    }
+</style>
+<div class="container align-content-center" style="margin-top:25px">
+    <h3 style="text-align:center; margin-right: 30px"></h3>
+    <div>
+        <form name="f" method="post" action="/DishManage/Edit">
+            <div class="form-group">
+                <hr />
+
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">
+                        @Html.DisplayNameFor(model => model.DishName)
+                    </label>
+                    <div class="col-md-9">
+                        <input type="text" value="@Html.DisplayFor(model => model.DishName)" class="form-control" name="dishName" id="dishName" required />
+                    </div>
+
+                </div>
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">@Html.DisplayNameFor(model => model.DishDescription):</label>
+                    <div class="col-md-9">
+                        <input type="text" value="@Html.DisplayFor(model => model.DishDescription)" class="form-control" size="70" name="dishDescription" id="dishDescription" required />
+                    </div>
+                </div>
+
+
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">@Html.DisplayNameFor(model => model.Price):</label>
+                    <div class="col-md-9">
+                        <input type="number" value="@Html.DisplayFor(model => model.Price)" class="form-control" name="price" id="price">
+                    </div>
+                </div>
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">@Html.DisplayNameFor(model => model.Unit):</label>
+                    <div class="col-md-9">
+
+                        <input type="text" value="@Html.DisplayFor(model => model.Unit)" class="form-control" name="unit" id="unit">
+
+                    </div>
+                </div>
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">@Html.DisplayNameFor(model => model.Category):</label>
+                    <div class="col-md-9">
+
+                        <input type="text" value="@Html.DisplayFor(model => model.Category)" class="form-control" name="category" id="category">
+
+                    </div>
+                </div>
+                <div class=" mb-3">
+                    <label class="control-label col-md-12">@Html.DisplayNameFor(model => model.Image) :</label>
+                    <img src="@Html.DisplayFor(model => model.Image)" style="margin-right: 20px" width="100" height="90" />
+
+                    <div class="col-md-9">
+                        <input type="text" value="@Html.DisplayFor(model => model.Image)" class="form-control" name="image" id="image">
+
+                    </div>
+                </div>
+
+
+                <p style="color: black">
+                    @Html.Raw("&larr;&nbsp;") @Html.ActionLink("Back to List", "Index")
+                </p>
+
+
+                <input type="hidden" value="@Html.DisplayFor(model => model.DishId)"  name="dishid" id="dishid">
+                <div class="form-group " style="display: flex; justify-content:center; align-items: center">
+
+                    <input type="submit" value="Cập nhật" class="btn btn-success" style="width: 20%; margin-right: 5px; color: black; font-size: 16px " />
+
+
+                </div>
+            </div>
+        </form>
+        
+        <div>
+            <br />
+        </div>
+        <div class="m-3">
+        </div>
+    </div>
+</div>
+
+

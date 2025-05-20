@@ -1,0 +1,63 @@
+﻿@using BASIC_PROJECT.Models
+@{
+    ViewBag.Title = "AddKhuyenMai";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6" style="max-height: 600px; overflow-y: auto;">
+            <p class="h1">
+                Tên Chương Trình:
+                <span class="text-primary h-3">
+                    @Model.Name
+                </span>
+            </p>
+            <p>Danh Sách Cách Món Được Áp Dụng Mã Khuyến Mãi</p>
+
+            @foreach (var CTKhuyenMai in Model.CTKhuyenMais)
+            {
+                <div class="card mb-3">
+                    <img src="~/Images/@CTKhuyenMai.anh" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Món Ăn: @CTKhuyenMai.TenMon</h5>
+                        <p class="card-text">Giá Cả: @CTKhuyenMai.Gia</p>
+                        <form method="post" action="@Url.Action("DeleteMonAnFromCTKhuyenMai", "AddCTKM", new { id = Model.Id, name = Model.Name })">
+                            <input type="hidden" name="MaKM" value="@Model.Id" />
+                            <input type="hidden" name="name" value="@Model.Name" />
+                            <button type="submit" name="MaMA" value="@CTKhuyenMai.MaMA" class="btn btn-warning">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-6" style="max-height: 600px; overflow-y: auto;">
+            <h2 class="mb-1">Danh Sách Các Món Ăn</h2>
+            <form method="get" action="@Url.Action("AddKhuyenMai", "AddCTKM", new { id = Model.Id, name = Model.Name })">
+                <div class="form-group">
+                    <label for="searchMonAn">Tìm Món Ăn:</label>
+                    <input type="text" class="form-control" id="searchMonAn" name="search" value="@ViewBag.Search" />
+                </div>
+                <button type="submit" class="btn btn-primary mt-1 mb-1">Tìm Kiếm</button>
+            </form>
+            @foreach (var monAn in Model.MonAns)
+            {
+                <div class="card mb-3">
+                    <img src="~/Images/@monAn.anh" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Tên Món Ăn: @monAn.TenMon</h5>
+                        <p class="card-text">Giá Cả: @monAn.Gia</p>
+                        <form method="post" action="@Url.Action("AddMonAnToCTKhuyenMai", "AddCTKM", new { id = Model.Id, name = Model.Name })">
+                            <input type="hidden" name="MaKM" value="@Model.Id" />
+                            <input type="hidden" name="name" value="@Model.Name" />
+                            <button type="submit" class="btn btn-primary" name="MaMA" value="@monAn.MaMA">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

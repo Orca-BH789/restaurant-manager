@@ -1,0 +1,42 @@
+﻿@model BASIC_PROJECT.Models.DetailBooking
+
+@{
+    ViewBag.Title = "Edit Food in Detail Booking";
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<h2>Edit Food in Detail Booking</h2>
+
+<table class="table">
+    <tr>
+        <th>Food</th>
+        <th></th>
+    </tr>
+    @foreach (var foodDetail in ViewBag.FoodDetails)
+    {
+        <tr>
+            <td>
+                @foodDetail.MonAn.TenMon
+            </td>
+            <td>
+                @Html.ActionLink("Remove", "RemoveFoodFromDetailBooking", new { id = foodDetail.MaMonDetail })
+            </td>
+        </tr>
+    }
+</table>
+
+<h3>Add Food</h3>
+@using (Html.BeginForm("AddFoodToDetailBooking", "Booking", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.DetaiBookingID)
+    <div class="form-group">
+        @Html.DropDownList("SelectedFoodIds", new SelectList(ViewBag.FoodList, "MaMA", "TenMon"), "Select a Food", new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Add Food" class="btn btn-primary" />
+    </div>
+}
+<div class="mt-2">
+    @Html.ActionLink("Back to List", "ViewMoreDetailBooking")
+</div>

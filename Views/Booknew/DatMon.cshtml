@@ -1,0 +1,990 @@
+﻿@{
+    ViewBag.Title = "Đặt Món";
+}
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+    body {
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .header {
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        color: white;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0;
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 5px 10px;
+        transition: background 0.3s ease;
+        border-radius: 5px;
+    }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .print-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 5px 10px;
+        transition: background 0.3s ease;
+        border-radius: 5px;
+    }
+
+        .print-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .main-container {
+        display: flex;
+        height: calc(100vh - 50px);
+        background-color: #f5f7fa;
+    }
+
+    .menu-container {
+        flex: 7;
+        display: flex;
+        background-color: #ffffff;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    .categories {
+        width: 130px;
+        background: linear-gradient(180deg, #f8f9fa, #e9ecef);
+        padding: 15px 0;
+        overflow-y: auto;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    .category {
+        padding: 12px 15px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+        .category:hover {
+            background-color: #e9ecef;
+            color: #1e88e5;
+        }
+
+        .category.active {
+            background-color: #ffffff;
+            color: #1e88e5;
+            font-weight: 600;
+            border-left: 3px solid #1e88e5;
+        }
+
+    .menu-items {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #ffffff;
+    }
+
+    .menu-tabs {
+        display: flex;
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 15px;
+    }
+
+    .menu-tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 15px;
+        color: #666;
+        transition: all 0.3s ease;
+    }
+
+        .menu-tab.active {
+            color: #1e88e5;
+            font-weight: 600;
+            border-bottom: 2px solid #1e88e5;
+        }
+
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .menu-item {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+    .menu-item-price {
+        padding: 5px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        background-color: rgba(255, 215, 0, 0.9);
+        color: #333;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border-radius: 5px;
+    }
+
+    .menu-item-name {
+        padding: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        color: #333;
+    }
+
+    .combo-item-details {
+        font-size: 12px;
+        color: #777;
+        padding: 0 10px 10px;
+        text-align: center;
+    }
+
+    .order-container {
+        flex: 3;
+        background-color: #ffffff;
+        border-left: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f9fa;
+    }
+
+    .order-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+        color: #333;
+    }
+
+    .add-customer-btn {
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+        .add-customer-btn:hover {
+            transform: scale(1.1);
+        }
+
+    .order-items {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px 20px;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        transition: background 0.3s ease;
+    }
+
+        .order-item:hover {
+            background-color: #f0f2f5;
+        }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .quantity-btn {
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+
+        .quantity-btn:hover {
+            background: linear-gradient(90deg, #42a5f5, #1e88e5);
+        }
+
+    .item-quantity {
+        width: 45px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 3px;
+        height: 24px;
+        font-size: 14px;
+    }
+
+        .item-quantity::-webkit-inner-spin-button,
+        .item-quantity::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+    .item-quantity {
+        -moz-appearance: textfield;
+    }
+
+    .item-name {
+        flex-grow: 1;
+        padding-left: 10px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .item-price {
+        text-align: right;
+        color: #1e88e5;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .empty-cart-message {
+        text-align: center;
+        color: #666;
+        font-size: 15px;
+        padding: 30px;
+        font-style: italic;
+    }
+
+    .order-footer {
+        padding: 20px;
+        border-top: 1px solid #e0e0e0;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .order-note {
+        text-align: left;
+        width: 100%;
+    }
+
+    .note-label {
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .note-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        resize: none;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+
+        .note-input:focus {
+            border-color: #1e88e5;
+            outline: none;
+        }
+
+    .voucher-input {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .voucher-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .total-amount {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e91e63;
+    }
+
+    .info-button {
+        background: none;
+        border: none;
+        color: #1e88e5;
+        cursor: pointer;
+        font-size: 16px;
+        transition: color 0.3s ease;
+    }
+
+        .info-button:hover {
+            color: #1565c0;
+        }
+
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .checkout-button, .checkout-pay-button {
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 25px;
+        min-width: 200px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+        .checkout-button:hover, .checkout-pay-button:hover {
+            background: linear-gradient(90deg, #42a5f5, #1e88e5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .checkout-button:active, .checkout-pay-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+</style>
+
+<div class="header">
+    <button class="back-button" onclick="location.href='@Url.Action("TaiCho", "Booknew")'">
+        <i class="glyphicon glyphicon-arrow-left"></i> Quay về
+    </button>
+    <h1 class="header-title">@(ViewBag.TableName ?? "Bàn không xác định")</h1>
+    <button class="print-button">
+        <i class="glyphicon glyphicon-print"></i>
+    </button>
+</div>
+
+<div class="main-container">
+    <div class="menu-container">
+        <div class="categories">
+            <div class="category active" data-category="all">Menu Tổng</div>
+            @if (ViewBag.Categories != null)
+            {
+                foreach (var category in ViewBag.Categories)
+                {
+                    <div class="category" data-category="@category">@category</div>
+                }
+            }
+        </div>
+        <div class="menu-items">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div style="color: red;">@ViewBag.ErrorMessage</div>
+            }
+            else
+            {
+                <div class="menu-tabs">
+                    <div class="menu-tab active" data-tab="dishes">Món lẻ</div>
+                </div>
+                <div class="menu-content" id="dishes-content">
+                    <div class="menu-grid">
+                        @if (ViewBag.Dishes != null)
+                        {
+                            foreach (var dish in ViewBag.Dishes)
+                            {
+                                <div class="menu-item" data-price="@dish.Price" data-category="@dish.Category" data-dish-id="@dish.DishId">
+                                    <img src="@dish.Image" alt="@dish.DishName"
+                                         onerror="this.src='https://cdn.pixabay.com/photo/2014/11/27/21/45/coffee-548238_1280.jpg'">
+                                    <div class="menu-item-price">@dish.Price.ToString("N0") đ</div>
+                                    <div class="menu-item-name">@dish.DishName</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="menu-content" id="combos-content" style="display: none;">
+                    <div class="menu-grid">
+                        @{
+                            var combos = ViewBag.Combos as List<BASIC_PROJECT.Controllers.BooknewController.ComboPriceView> ?? new List<BASIC_PROJECT.Controllers.BooknewController.ComboPriceView>();
+                            foreach (var combo in combos)
+                            {
+                                var discountedPrice = combo.Price * 0.9m;
+                                <div class="menu-item" data-price="@discountedPrice.ToString("F0")" data-category="combo">
+                                    <img src="https://cdn.pixabay.com/photo/2017/12/09/08/18/food-3007395_1280.jpg" alt="@combo.ComboName"
+                                         onerror="this.src='https://cdn.pixabay.com/photo/2014/11/27/21/45/coffee-548238_1280.jpg'">
+                                    <div class="menu-item-price">
+                                        <span style="text-decoration: line-through; color: gray;">@combo.Price.ToString("N0") đ</span>
+                                        <span style="color: red; font-weight: bold; margin-left: 5px;">@discountedPrice.ToString("N0") đ</span>
+                                    </div>
+                                    <div class="menu-item-name">@combo.ComboName</div>
+                                    <div class="combo-item-details">
+                                        <div style="font-size: 10px; padding-bottom: 25px; color: #555;font-weight:bold">@combo.Description</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="order-container">
+        <div class="order-header">
+            <h2 class="order-title">Giỏ hàng (<span id="cart-count">0</span>)</h2>
+            <button class="add-customer-btn">+</button>
+        </div>
+
+        <div class="order-items" id="order-items">
+            <!-- Order items will be added dynamically -->
+        </div>
+
+        <div class="order-footer">
+            <div class="order-note">
+                <div class="note-label">Ghi chú</div>
+                <textarea class="note-input" rows="3" placeholder="Nhập ghi chú của bạn..."></textarea>
+            </div>
+
+            <div class="voucher-input">
+                <div class="voucher-label">Tổng Tiền</div>
+                <span class="total-amount" id="total-amount">0 đ</span>
+                <button class="info-button">
+                    <i class="glyphicon glyphicon-info-sign"></i>
+                </button>
+            </div>
+
+            <div class="buttons-container">
+                @if (ViewBag.TableId == 99) // Hide "Đặt bàn" button if tableId is 99
+                {
+                    <button class="checkout-pay-button" id="checkout-pay-btn-online">
+                        Thanh toán online
+                    </button>
+                }
+                else
+                {
+                    <button class="checkout-button" id="checkout-btn">
+                        Đặt bàn
+                    </button>
+                    <button class="checkout-pay-button-offline" id="checkout-pay-btn-offline">
+                        Thanh toán
+                    </button>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            let orderItems = {};
+            let existingBookingId = null;
+
+            function getTableId() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('tableId') || '@ViewBag.TableId';
+            }
+
+            function loadOrderedDishes() {
+                $.ajax({
+                    url: '@Url.Action("GetOrderedDishes", "Booknew")',
+                    type: 'GET',
+                    data: { tableId: getTableId() },
+                    success: function (response) {
+                        $('#order-items').empty();
+                        if (response.success && response.dishes && response.dishes.length > 0) {
+                            existingBookingId = response.dishes[0].booking_id;
+                            let notes = [];
+                            response.dishes.forEach(function (dish) {
+                                addToOrder(dish.dish_name, dish.price, dish.dish_id, dish.quantity, dish.note);
+                                if (dish.note) {
+                                    notes.push(dish.note);
+                                }
+                            });
+                            if (notes.length > 0) {
+                                $('.note-input').val(notes.join(', '));
+                            }
+                        } else {
+                            existingBookingId = null;
+                            $('#order-items').html('<div class="empty-cart-message">Vui lòng click chọn món</div>');
+                            updateTotal();
+                        }
+                    },
+                    error: function (xhr) {
+                        existingBookingId = null;
+                        $('#order-items').html('<div class="empty-cart-message">Vui lòng click chọn món</div>');
+                        updateTotal();
+                    }
+                });
+            }
+
+            // Add category filtering functionality
+            $('.category').click(function () {
+                let selectedCategory = $(this).data('category');
+
+                // Highlight the selected category
+                $('.category').removeClass('active');
+                $(this).addClass('active');
+
+                // Filter menu items based on the selected category
+                if (selectedCategory === 'all') {
+                    $('.menu-item').show();
+                } else {
+                    $('.menu-item').each(function () {
+                        if ($(this).data('category') === selectedCategory) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                }
+            });
+
+            $('.menu-item').click(function () {
+                if ($(this).is(':visible')) {
+                    var itemName = $(this).find('.menu-item-name').text();
+                    var price = parseFloat($(this).data('price'));
+                    var dishId = $(this).data('dish-id');
+                    addToOrder(itemName, price, dishId);
+                }
+            });
+
+            $(document).on('click', '.increase', function () {
+                let $item = $(this).closest('.order-item');
+                let $input = $item.find('.item-quantity');
+                let quantity = parseInt($input.val()) || 0;
+                quantity++;
+                $input.val(quantity);
+                updateItem($item, quantity);
+            });
+
+            $(document).on('click', '.decrease', function () {
+                let $item = $(this).closest('.order-item');
+                let $input = $item.find('.item-quantity');
+                let quantity = parseInt($input.val()) || 0;
+                if (quantity > 0) {
+                    quantity--;
+                    $input.val(quantity);
+                    if (quantity === 0) {
+                        let itemName = $item.data('name');
+                        delete orderItems[itemName];
+                        $item.remove();
+                        updateTotal();
+                        if ($('.order-item').length === 0) {
+                            $('#order-items').html('<div class="empty-cart-message">Vui lòng click chọn món</div>');
+                        }
+                    } else {
+                        updateItem($item, quantity);
+                    }
+                }
+            });
+
+            $(document).on('input', '.item-quantity', function () {
+                let $item = $(this).closest('.order-item');
+                let quantity = parseInt($(this).val());
+                if (quantity < 0 || isNaN(quantity)) {
+                    quantity = 0;
+                    $(this).val(0);
+                }
+                if (quantity === 0) {
+                    let itemName = $item.data('name');
+                    delete orderItems[itemName];
+                    $item.remove();
+                    updateTotal();
+                    if ($('.order-item').length === 0) {
+                        $('#order-items').html('<div class="empty-cart-message">Vui lòng click chọn món</div>');
+                    }
+                } else {
+                    updateItem($item, quantity);
+                }
+            });
+
+            function addToOrder(name, price, dishId, initialQuantity = 1, note = "") {
+                if ($('.empty-cart-message').length > 0) {
+                    $('#order-items').empty();
+                }
+
+                if (orderItems[name]) {
+                    let $item = $(`.order-item[data-name="${name}"]`);
+                    let quantity = parseInt($item.find('.item-quantity').val()) + initialQuantity;
+                    $item.find('.item-quantity').val(quantity);
+                    updateItem($item, quantity);
+                } else {
+                    let noteHtml = note ? `<div class="order-item-note">${note}</div>` : '';
+                    $('#order-items').append(`
+                        <div class="order-item" data-name="${name}" data-price="${price}" data-dish-id="${dishId}">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn decrease">-</button>
+                                <input type="number" class="item-quantity" value="${initialQuantity}" min="0">
+                                <button class="quantity-btn increase">+</button>
+                            </div>
+                            <div class="item-name">${name}</div>
+                            <div class="item-price">${(price * initialQuantity).toLocaleString()} đ</div>
+                        </div>
+                    `);
+                    orderItems[name] = true;
+                }
+                updateTotal();
+            }
+
+            function updateItem($item, quantity) {
+                let price = parseFloat($item.data('price'));
+                $item.find('.item-price').text((price * quantity).toLocaleString() + ' đ');
+                updateTotal();
+            }
+
+            function updateTotal() {
+                let total = 0;
+                $('.order-item').each(function () {
+                    let quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                    let price = parseFloat($(this).data('price'));
+                    total += quantity * price;
+                });
+                $('#total-amount').text(total.toLocaleString() + ' đ');
+                $('#cart-count').text($('.order-item').length);
+                return total;
+            }
+
+            $('#checkout-btn').click(function () {
+                if (getTableId() != '99') {
+                    let orderData = [];
+                    let totalPrice = updateTotal();
+                    let note = $('.note-input').val() || "";
+                    let noteList = note.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+                    $('.order-item').each(function (index) {
+                        let quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                        let dishId = $(this).data('dish-id');
+                        if (quantity > 0) {
+                            orderData.push({
+                                dish_id: dishId,
+                                note: noteList[index] || "",
+                                quantity: quantity,
+                                status: true
+                            });
+                        }
+                    });
+
+                    if (orderData.length === 0) {
+                        alert('Giỏ hàng trống. Vui lòng chọn món trước khi đặt bàn.');
+                        return;
+                    }
+
+                    if (existingBookingId) {
+                        $.ajax({
+                            url: '@Url.Action("UpdateBookingDishes", "Booknew")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                bookingId: existingBookingId,
+                                dishesJson: JSON.stringify(orderData)
+                            }),
+                            success: function (response) {
+                                if (response.success) {
+                                    window.location.href = '@Url.Action("TaiCho", "Booknew")';
+                                } else {
+                                    alert('Error updating booking: ' + response.message);
+                                }
+                            },
+                            error: function (xhr) {
+                                alert('Error updating booking: ' + (xhr.responseText || 'Unknown error'));
+                            }
+                        });
+                    } else {
+                        let bookingData = {
+                            customer_id: '@(ViewBag.SessionUser ?? 4)',
+                            booking_date: new Date().toISOString().slice(0, 10),
+                            arrival_date: new Date().toISOString().slice(0, 10),
+                            end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                            type: 'offline',
+                            total_amount: totalPrice,
+                            status: 'chưa thanh toán',
+                            table_id: getTableId(),
+                            total_price: totalPrice,
+                            dishes: orderData
+                        };
+
+                        $.ajax({
+                            url: '@Url.Action("ProcessBooking", "Booknew")',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(bookingData),
+                            success: function (response) {
+                                if (response.success) {
+                                    window.location.href = '@Url.Action("TaiCho", "Booknew")';
+                                } else {
+                                    alert('Error creating booking: ' + response.message);
+                                }
+                            },
+                            error: function (xhr) {
+                                alert('Error submitting booking: ' + (xhr.responseText || 'Unknown error'));
+                            }
+                        });
+                    }
+                }
+            });
+
+            $('#checkout-pay-btn-online').click(function () {
+                let orderData = [];
+                let totalPrice = updateTotal();
+                let note = $('.note-input').val() || "";
+                let noteList = note.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+                $('.order-item').each(function (index) {
+                    let quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                    let dishId = $(this).data('dish-id');
+                    let dishName = $(this).data('name');
+                    let price = parseFloat($(this).data('price'));
+                    if (quantity > 0) {
+                        orderData.push({
+                            dish_id: dishId,
+                            dish_name: dishName,
+                            price: price,
+                            note: noteList[index] || "",
+                            quantity: quantity,
+                            status: true
+                        });
+                    }
+                });
+
+                if (orderData.length === 0) {
+                    alert('Giỏ hàng trống. Vui lòng chọn món trước khi thanh toán.');
+                    return;
+                }
+
+                let bookingData = {
+                    customer_id: '@(ViewBag.SessionUser ?? 4)',
+                    booking_date: new Date().toISOString().slice(0, 10),
+                    arrival_date: new Date().toISOString().slice(0, 10),
+                    end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                    type: 'online',
+                    total_amount: totalPrice,
+                    status: 'chưa thanh toán',
+                    table_id: parseInt(getTableId()),
+                    total_price: totalPrice,
+                    dishes: orderData
+                };
+
+                console.log('Booking Data:', bookingData);
+
+                $.ajax({
+                    url: '@Url.Action("ProcessBookingOnline", "Booknew")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(bookingData),
+                    success: function (response) {
+                        console.log('Response from ProcessBookingOnline:', response);
+                        if (response && response.success && response.idbooking) {
+                            console.log('Inserted Dishes:', response.insertedDishes);
+                            sessionStorage.setItem('orderItems', JSON.stringify(orderData));
+                            sessionStorage.setItem('totalAmount', totalPrice);
+                            sessionStorage.setItem('tableInfo', getTableId() == 99 ? 'Bàn mang về - MANG VỔ' : 'Bàn ' + getTableId());
+                            window.location.href = '@Url.Action("Payment", "Booknew")' + '?bookingId=' + response.idbooking;
+                        } else {
+                            alert('Lỗi tạo đơn đặt bàn: ' + (response && response.message ? response.message : 'Không nhận được booking ID'));
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', xhr.statusText);
+                        if (status === "timeout" || error === "NetworkError") {
+                            let retries = 3;
+                            let attempt = 0;
+                            const retryRequest = () => {
+                                attempt++;
+                                if (attempt <= retries) {
+                                    console.log(`Retrying request (${attempt}/${retries})...`);
+                                    $.ajax(this).fail(function (xhrRetry, statusRetry, errorRetry) {
+                                        if (attempt === retries) {
+                                            alert('Lỗi kết nối sau nhiều lần thử: Vui lòng kiểm tra mạng và thử lại');
+                                        } else {
+                                            retryRequest();
+                                        }
+                                    });
+                                }
+                            };
+                            retryRequest();
+                        } else {
+                            alert('Lỗi kết nối: Vui lòng kiểm tra mạng và thử lại');
+                        }
+                    },
+                    timeout: 30000
+                });
+            });
+
+            $('#checkout-pay-btn-offline').click(function () {
+                if (getTableId() == '99') {
+                    alert('Chức năng thanh toán offline không áp dụng cho bàn mang về.');
+                    return;
+                }
+
+                let orderData = [];
+                let totalPrice = updateTotal();
+                let note = $('.note-input').val() || "";
+                let noteList = note.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+                let itemsFromOrderItems = [];
+                $('.order-item').each(function (index) {
+                    let quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                    let dishId = $(this).data('dish-id');
+                    let dishName = $(this).data('name');
+                    let price = parseFloat($(this).data('price'));
+                    if (quantity > 0) {
+                        itemsFromOrderItems.push({
+                            DishId: dishId,
+                            Name: dishName,
+                            Price: price,
+                            Quantity: quantity,
+                            Note: noteList[index] || ""
+                        });
+                    }
+                });
+
+                orderData = itemsFromOrderItems;
+
+                if (orderData.length === 0) {
+                    alert('Giỏ hàng trống. Vui lòng chọn món trước khi thanh toán.');
+                    return;
+                }
+
+                console.log("OrderData being sent to PreparePayment:", orderData);
+
+                if (existingBookingId) {
+                    $.ajax({
+                        url: '@Url.Action("PreparePayment", "Booknew")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            bookingId: existingBookingId,
+                            orderItems: orderData,
+                            totalAmount: totalPrice,
+                            tableInfo: 'Bàn ' + getTableId()
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                window.location.href = '@Url.Action("Payment", "Booknew")' + '?bookingId=' + existingBookingId;
+                            } else {
+                                alert('Lỗi chuẩn bị thanh toán: ' + response.message);
+                            }
+                        },
+                        error: function (xhr) {
+                            alert('Lỗi kết nối: ' + (xhr.responseText || 'Unknown error'));
+                        }
+                    });
+                } else {
+                    let bookingData = {
+                        customer_id: '@(ViewBag.SessionUser ?? 4)',
+                        booking_date: new Date().toISOString().slice(0, 10),
+                        arrival_date: new Date().toISOString().slice(0, 10),
+                        end_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                        type: 'offline',
+                        total_amount: totalPrice,
+                        status: 'chưa thanh toán',
+                        table_id: getTableId(),
+                        total_price: totalPrice,
+                        dishes: orderData
+                    };
+
+                    $.ajax({
+                        url: '@Url.Action("ProcessBooking", "Booknew")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(bookingData),
+                        success: function (response) {
+                            if (response.success) {
+                                $.ajax({
+                                    url: '@Url.Action("PreparePayment", "Booknew")',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({
+                                        bookingId: response.idbooking,
+                                        orderItems: orderData,
+                                        totalAmount: totalPrice,
+                                        tableInfo: 'Bàn ' + getTableId()
+                                    }),
+                                    success: function (prepResponse) {
+                                        if (prepResponse.success) {
+                                            window.location.href = '@Url.Action("Payment", "Booknew")' + '?bookingId=' + response.idbooking;
+                                        } else {
+                                            alert('Lỗi chuẩn bị thanh toán: ' + prepResponse.message);
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        alert('Lỗi kết nối: ' + (xhr.responseText || 'Unknown error'));
+                                    }
+                                });
+                            } else {
+                                alert('Lỗi tạo đơn đặt bàn: ' + response.message);
+                            }
+                        },
+                        error: function (xhr) {
+                            alert('Lỗi kết nối: ' + (xhr.responseText || 'Unknown error'));
+                        }
+                    });
+                }
+            });
+
+            loadOrderedDishes();
+        });
+    </script>
+}
